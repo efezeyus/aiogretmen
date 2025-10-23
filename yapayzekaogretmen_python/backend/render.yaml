@@ -1,0 +1,22 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: yapayzekaogretmen-backend
+    env: python
+    region: frankfurt
+    plan: free
+    branch: main
+    rootDir: yapayzekaogretmen_python/backend
+    buildCommand: pip install --upgrade pip && pip install -r requirements.render.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: PORT
+        value: 8000
+      - key: PYTHON_VERSION
+        value: 3.11.0
+

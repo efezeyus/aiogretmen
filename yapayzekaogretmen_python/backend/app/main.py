@@ -258,29 +258,35 @@ async def display_startup_banner():
     """
     logger.info(banner)
     
-    # Redis cache bağlantısı
+    # Redis cache bağlantısı (Opsiyonel)
     try:
         from app.services.cache_service import cache
         await cache.connect()
         logger.info("✅ Redis cache bağlantısı başarılı")
+    except ImportError:
+        logger.warning("⚠️ Cache service bulunamadı (opsiyonel)")
     except Exception as e:
         logger.warning(f"⚠️ Redis cache bağlantısı başarısız: {e}")
         logger.warning("Sistem cache olmadan devam edecek")
     
-    # Elasticsearch bağlantısı
+    # Elasticsearch bağlantısı (Opsiyonel)
     try:
         from app.services.search_service import search_service
         await search_service.connect()
         logger.info("✅ Elasticsearch bağlantısı başarılı")
+    except ImportError:
+        logger.warning("⚠️ Search service bulunamadı (opsiyonel)")
     except Exception as e:
         logger.warning(f"⚠️ Elasticsearch bağlantısı başarısız: {e}")
         logger.warning("Sistem arama servisi olmadan devam edecek")
     
-    # Notification servisi başlat
+    # Notification servisi başlat (Opsiyonel)
     try:
         from app.services.notification_service import notification_service
         await notification_service.initialize()
         logger.info("✅ Notification servisi başlatıldı")
+    except ImportError:
+        logger.warning("⚠️ Notification service bulunamadı (opsiyonel)")
     except Exception as e:
         logger.warning(f"⚠️ Notification servisi başlatma hatası: {e}")
         logger.warning("Sistem bildirimler olmadan devam edecek")
