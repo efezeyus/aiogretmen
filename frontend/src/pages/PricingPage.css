@@ -1,0 +1,365 @@
+/* Pricing Page Styles */
+.pricing-page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: #333;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Reuse header styles from landing page */
+.pricing-page .header {
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.pricing-page .logo {
+  text-decoration: none;
+  color: inherit;
+}
+
+.pricing-page .logo h1 {
+  font-size: 24px;
+  color: #5c3cfc;
+  margin: 0;
+}
+
+.pricing-page .nav-menu .active {
+  color: #5c3cfc;
+  font-weight: 600;
+}
+
+/* Pricing Hero */
+.pricing-hero {
+  padding: 120px 0 60px;
+  text-align: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.pricing-hero h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.pricing-hero p {
+  font-size: 20px;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+/* Billing Toggle */
+.billing-toggle {
+  display: inline-flex;
+  background: white;
+  border-radius: 50px;
+  padding: 5px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.billing-toggle button {
+  padding: 12px 30px;
+  border: none;
+  background: transparent;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.billing-toggle button.active {
+  background: #5c3cfc;
+  color: white;
+}
+
+.save-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #ff6b6b;
+  color: white;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+/* Pricing Plans */
+.pricing-plans {
+  padding: 80px 0;
+  background: #f8f9fa;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.plan-card {
+  background: white;
+  border-radius: 16px;
+  padding: 40px 30px;
+  box-shadow: 0 5px 30px rgba(0,0,0,0.08);
+  position: relative;
+  transition: transform 0.3s;
+}
+
+.plan-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+}
+
+.plan-card.recommended {
+  border: 2px solid #5c3cfc;
+  transform: scale(1.05);
+}
+
+.recommended-badge {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #5c3cfc;
+  color: white;
+  padding: 6px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.plan-card h3 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+/* Price Display */
+.price {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.currency {
+  font-size: 24px;
+  vertical-align: top;
+  color: #666;
+}
+
+.amount {
+  font-size: 48px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.period {
+  font-size: 18px;
+  color: #666;
+}
+
+.savings {
+  text-align: center;
+  color: #27ae60;
+  font-weight: 600;
+  margin-bottom: 30px;
+}
+
+/* Features List */
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 30px 0;
+}
+
+.features-list li {
+  padding: 12px 0;
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  font-size: 15px;
+  color: #666;
+}
+
+.check {
+  color: #27ae60;
+  font-weight: bold;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* Select Button */
+.btn-select {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  text-align: center;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s;
+  margin-top: 30px;
+}
+
+.btn-select.btn-primary {
+  background: #5c3cfc;
+  color: white;
+}
+
+.btn-select.btn-primary:hover {
+  background: #4730d3;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(92, 60, 252, 0.3);
+}
+
+.btn-select.btn-secondary {
+  background: transparent;
+  color: #5c3cfc;
+  border: 2px solid #5c3cfc;
+}
+
+.btn-select.btn-secondary:hover {
+  background: #5c3cfc;
+  color: white;
+}
+
+/* FAQ Section */
+.faq {
+  padding: 80px 0;
+}
+
+.faq h2 {
+  font-size: 36px;
+  text-align: center;
+  margin-bottom: 50px;
+  color: #2c3e50;
+}
+
+.faq-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.faq-item h4 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+.faq-item p {
+  color: #666;
+  line-height: 1.8;
+}
+
+/* Guarantee Section */
+.guarantee {
+  padding: 60px 0;
+  background: #f8f9fa;
+}
+
+.guarantee-content {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.guarantee-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.guarantee h3 {
+  font-size: 28px;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+.guarantee p {
+  font-size: 18px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* CTA Section */
+.pricing-cta {
+  padding: 80px 0;
+  text-align: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.pricing-cta h2 {
+  font-size: 36px;
+  margin-bottom: 15px;
+}
+
+.pricing-cta p {
+  font-size: 20px;
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+.pricing-cta .btn-primary {
+  background: white;
+  color: #5c3cfc;
+  padding: 15px 40px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 18px;
+  transition: all 0.3s;
+  display: inline-block;
+}
+
+.pricing-cta .btn-primary:hover {
+  background: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Footer */
+.pricing-page .footer {
+  background: #2c3e50;
+  color: #ecf0f1;
+  padding: 40px 0;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pricing-hero h1 {
+    font-size: 36px;
+  }
+  
+  .plans-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .plan-card.recommended {
+    transform: none;
+  }
+  
+  .faq-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .billing-toggle {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .billing-toggle button {
+    width: 100%;
+  }
+} 

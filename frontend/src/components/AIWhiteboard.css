@@ -1,0 +1,326 @@
+.ai-whiteboard-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Araç Çubuğu */
+.whiteboard-toolbar {
+  display: flex;
+  gap: 20px;
+  padding: 15px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.tool-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 0 15px;
+  border-right: 1px solid #e0e0e0;
+}
+
+.tool-group:last-child {
+  border-right: none;
+}
+
+.tool-group label {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.tool-btn {
+  width: 45px;
+  height: 45px;
+  border: 2px solid #e0e0e0;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tool-btn:hover {
+  background: #f5f5f5;
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+}
+
+.tool-btn.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.tool-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tool-btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.ai-help-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.ai-help-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.ai-help-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Canvas Tahta */
+.whiteboard-canvas {
+  flex: 1;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  cursor: crosshair;
+  transition: all 0.3s ease;
+}
+
+.whiteboard-canvas.ai-teaching {
+  cursor: not-allowed;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  border: 3px solid #667eea;
+}
+
+/* AI Öğretmen Göstergesi */
+.ai-teaching-indicator {
+  position: fixed;
+  top: 50%;
+  right: 30px;
+  transform: translateY(-50%);
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: pulse 2s infinite;
+  z-index: 1000;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    transform: translateY(-50%) scale(1.05);
+  }
+}
+
+.ai-avatar {
+  font-size: 48px;
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.ai-message {
+  font-size: 14px;
+  font-weight: 600;
+  color: #667eea;
+  text-align: center;
+}
+
+/* Problem Girişi */
+.problem-input {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.problem-input input {
+  flex: 1;
+  padding: 12px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.problem-input input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.problem-input button {
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.problem-input button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.problem-input button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Renk seçici */
+input[type="color"] {
+  width: 50px;
+  height: 45px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+/* Kaydırıcı */
+input[type="range"] {
+  width: 100px;
+  height: 6px;
+  border-radius: 3px;
+  background: #e0e0e0;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #667eea;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #667eea;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ai-whiteboard-container {
+    padding: 10px;
+  }
+
+  .whiteboard-toolbar {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .tool-group {
+    padding: 0 10px;
+  }
+
+  .tool-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .ai-teaching-indicator {
+    right: 15px;
+    padding: 15px;
+  }
+
+  .ai-avatar {
+    font-size: 36px;
+  }
+
+  .problem-input {
+    flex-direction: column;
+  }
+
+  .problem-input button {
+    width: 100%;
+  }
+}
+
+/* Animasyonlar */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tool-btn, .ai-help-btn, .problem-input button {
+  animation: fadeIn 0.5s ease;
+}
+
+/* Tooltip */
+.tool-btn[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 10px;
+  background: #333;
+  color: white;
+  font-size: 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 1000;
+}
+

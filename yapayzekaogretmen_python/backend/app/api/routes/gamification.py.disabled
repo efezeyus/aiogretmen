@@ -1,0 +1,205 @@
+"""
+Yapay Zeka Öğretmen - Gamification Rotaları
+------------------------------------------
+Gamification sistemi için API rotaları.
+"""
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Path
+from typing import List, Optional
+from beanie import PydanticObjectId
+
+# from app.api.controllers import gamification_controller
+from app.api.middlewares.auth import get_current_user
+from app.models.user import User
+from app.api.schemas.gamification import (
+    UserStatsResponse,
+    BadgeResponse,
+    AchievementResponse,
+    LeaderboardResponse,
+    RewardResponse,
+    LevelUpResponse
+)
+
+router = APIRouter(prefix="/api/gamification", tags=["Gamification"])
+
+@router.get("/stats", response_model=UserStatsResponse)
+async def get_user_stats(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Kullanıcının gamification istatistiklerini getir.
+    """
+    return await gamification_controller.get_user_stats(current_user)
+
+
+@router.get("/badges", response_model=List[BadgeResponse])
+async def get_user_badges(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Kullanıcının rozetlerini getir.
+    """
+    return await gamification_controller.get_user_badges(current_user)
+
+
+@router.get("/achievements", response_model=List[AchievementResponse])
+async def get_user_achievements(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Kullanıcının başarılarını getir.
+    """
+    return await gamification_controller.get_user_achievements(current_user)
+
+
+@router.get("/leaderboard", response_model=LeaderboardResponse)
+async def get_leaderboard(
+    limit: int = Query(10, ge=1, le=100, description="Getirilecek kullanıcı sayısı"),
+    period: str = Query("week", description="Liderlik tablosu periyodu (week/month/year)"),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Liderlik tablosunu getir.
+    """
+    return await gamification_controller.get_leaderboard(limit, period, current_user)
+
+
+@router.get("/rewards", response_model=List[RewardResponse])
+async def get_recent_rewards(
+    limit: int = Query(10, ge=1, le=50, description="Getirilecek ödül sayısı"),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Kullanıcının son kazandığı ödülleri getir.
+    """
+    return await gamification_controller.get_recent_rewards(current_user, limit)
+
+
+@router.post("/award-points")
+async def award_points(
+    points: int,
+    reason: str,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Kullanıcıya puan ver.
+    """
+    return await gamification_controller.award_points(current_user, points, reason)
+
+
+@router.post("/check-achievements")
+async def check_achievements(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Kullanıcının başarılarını kontrol et ve yeni kazanılanları bildir.
+    """
+    return await gamification_controller.check_achievements(current_user)
+
+
+@router.post("/level-up", response_model=LevelUpResponse)
+async def level_up(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Kullanıcının seviye atlamasını kontrol et.
+    """
+    return await gamification_controller.check_level_up(current_user)
+
+
+@router.get("/daily-streak")
+async def get_daily_streak(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Kullanıcının günlük çalışma serisini getir.
+    """
+    return await gamification_controller.get_daily_streak(current_user)
+
+
+@router.post("/complete-activity")
+async def complete_activity(
+    activity_type: str,
+    activity_data: dict,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Bir aktiviteyi tamamla ve puanları hesapla.
+    """
+    return await gamification_controller.complete_activity(current_user, activity_type, activity_data)
+
+
+@router.get("/challenges", response_model=List[dict])
+async def get_available_challenges(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Kullanıcı için mevcut görevleri getir.
+    """
+    return await gamification_controller.get_available_challenges(current_user)
+
+
+@router.post("/challenges/{challenge_id}/complete")
+async def complete_challenge(
+    challenge_id: PydanticObjectId = Path(..., description="Görev ID"),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Bir görevi tamamla.
+    """
+    return await gamification_controller.complete_challenge(current_user, challenge_id)
+
+
+@router.get("/ranking/{user_id}")
+async def get_user_ranking(
+    user_id: PydanticObjectId = Path(..., description="Kullanıcı ID"),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Belirli bir kullanıcının sıralamasını getir.
+    """
+    return await gamification_controller.get_user_ranking(user_id, current_user)
+
+
+@router.get("/stats/compare/{other_user_id}")
+async def compare_stats(
+    other_user_id: PydanticObjectId = Path(..., description="Karşılaştırılacak kullanıcı ID"),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    İki kullanıcının istatistiklerini karşılaştır.
+    """
+    return await gamification_controller.compare_user_stats(current_user, other_user_id)
+
+
+@router.get("/rewards/history")
+async def get_rewards_history(
+    skip: int = Query(0, ge=0, description="Atlanacak kayıt sayısı"),
+    limit: int = Query(20, ge=1, le=100, description="Getirilecek kayıt sayısı"),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Kullanıcının ödül geçmişini getir.
+    """
+    return await gamification_controller.get_rewards_history(current_user, skip, limit)
+
+
+@router.get("/badges/{badge_id}")
+async def get_badge_details(
+    badge_id: PydanticObjectId = Path(..., description="Rozet ID"),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Belirli bir rozetin detaylarını getir.
+    """
+    return await gamification_controller.get_badge_details(badge_id, current_user)
+
+
+@router.get("/achievements/{achievement_id}")
+async def get_achievement_details(
+    achievement_id: PydanticObjectId = Path(..., description="Başarı ID"),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Belirli bir başarının detaylarını getir.
+    """
+    return await gamification_controller.get_achievement_details(achievement_id, current_user) 

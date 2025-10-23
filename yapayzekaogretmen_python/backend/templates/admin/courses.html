@@ -1,0 +1,707 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Kurs Yönetimi - Admin Panel | Yapay Zeka Öğretmen{% endblock %}
+
+{% block page_title %}Kurs Yönetimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .course-image {
+        width: 80px;
+        height: 45px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+    
+    .course-status {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .course-status.draft {
+        background-color: #f0f0f0;
+        color: #666;
+    }
+    
+    .course-status.published {
+        background-color: #e3fcef;
+        color: #00a651;
+    }
+    
+    .course-status.archived {
+        background-color: #fff0e5;
+        color: #ff6b00;
+    }
+    
+    .tabs {
+        display: flex;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e0e0e0;
+        width: 100%;
+    }
+    
+    .tab {
+        padding: 12px 20px;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+    
+    .tab.active {
+        color: #4361ee;
+        border-bottom: 2px solid #4361ee;
+    }
+    
+    .tab-count {
+        display: inline-block;
+        background: #f0f0f0;
+        color: #666;
+        border-radius: 20px;
+        padding: 2px 8px;
+        font-size: 12px;
+        margin-left: 5px;
+    }
+    
+    .tab.active .tab-count {
+        background: #e7edff;
+        color: #4361ee;
+    }
+    
+    .section-title {
+        padding: 10px 15px;
+        font-weight: 600;
+        font-size: 14px;
+        background: #f9f9f9;
+        margin: -10px -15px 15px;
+        border-bottom: 1px solid #eee;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Üst Butonlar ve Arama -->
+<div class="admin-actions">
+    <div class="search-container">
+        <input type="text" id="course-search" placeholder="Kurs ara..." class="search-input">
+        <i class="fas fa-search search-icon"></i>
+    </div>
+    
+    <div class="action-buttons">
+        <a href="/admin/kurslar/yeni" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Yeni Kurs
+        </a>
+        
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle">
+                <i class="fas fa-filter"></i> Filtrele
+            </button>
+            <div class="dropdown-menu">
+                <a href="#" class="dropdown-item" data-filter="all">Tümü</a>
+                <a href="#" class="dropdown-item" data-filter="published">Yayında</a>
+                <a href="#" class="dropdown-item" data-filter="draft">Taslak</a>
+                <a href="#" class="dropdown-item" data-filter="archived">Arşivlenmiş</a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item" data-filter="free">Ücretsiz</a>
+                <a href="#" class="dropdown-item" data-filter="paid">Ücretli</a>
+            </div>
+        </div>
+        
+        <button type="button" class="btn btn-outline" id="export-courses">
+            <i class="fas fa-download"></i> Dışa Aktar
+        </button>
+    </div>
+</div>
+
+<!-- Sekmeler -->
+<div class="tabs">
+    <div class="tab active" data-tab="all">Tüm Kurslar <span class="tab-count">{{ courses|length }}</span></div>
+    <div class="tab" data-tab="published">Yayında <span class="tab-count">{{ courses|selectattr('status', 'eq', 'published')|list|length }}</span></div>
+    <div class="tab" data-tab="draft">Taslak <span class="tab-count">{{ courses|selectattr('status', 'eq', 'draft')|list|length }}</span></div>
+    <div class="tab" data-tab="archived">Arşivlenmiş <span class="tab-count">{{ courses|selectattr('status', 'eq', 'archived')|list|length }}</span></div>
+</div>
+
+<!-- Ana Tablo -->
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h3>Kurs Listesi</h3>
+        <div class="card-actions">
+            <span>Toplam: {{ courses|length }} kurs</span>
+        </div>
+    </div>
+    <div class="admin-card-body">
+        <div class="admin-table-container">
+            <table class="admin-table" id="courses-table">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="select-all-courses">
+                        </th>
+                        <th>Kurs</th>
+                        <th>Kategori</th>
+                        <th>Eğitmen</th>
+                        <th>Seviye</th>
+                        <th>Fiyat</th>
+                        <th>Durum</th>
+                        <th>Öğrenci Sayısı</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses %}
+                    <tr data-course-id="{{ course.id }}" data-course-status="{{ course.status }}">
+                        <td>
+                            <input type="checkbox" class="course-checkbox">
+                        </td>
+                        <td>
+                            <div class="course-info-cell">
+                                <img src="{{ course.image_url or '/static/img/default-course.jpg' }}" alt="{{ course.title }}" class="course-image">
+                                <div>
+                                    <strong>{{ course.title }}</strong>
+                                    <small>{{ course.sections|length }} bölüm, {{ course.content_count }} içerik</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ course.category }}</td>
+                        <td>{{ course.instructor.name }}</td>
+                        <td>{{ course.level }}</td>
+                        <td>
+                            {% if course.price == 0 %}
+                                <span class="badge badge-success">Ücretsiz</span>
+                            {% else %}
+                                <span>{{ course.price|format_currency }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="course-status {{ course.status }}">
+                                {% if course.status == 'draft' %}
+                                    Taslak
+                                {% elif course.status == 'published' %}
+                                    Yayında
+                                {% elif course.status == 'archived' %}
+                                    Arşivlenmiş
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>{{ course.student_count or 0 }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button type="button" class="action-btn" data-bs-toggle="tooltip" title="Düzenle" onclick="editCourse('{{ course.id }}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="action-btn" data-bs-toggle="tooltip" title="İçerik Yönetimi" onclick="manageCourseContent('{{ course.id }}')">
+                                    <i class="fas fa-list-ul"></i>
+                                </button>
+                                <button type="button" class="action-btn" data-bs-toggle="tooltip" title="Raporlar" onclick="viewCourseReports('{{ course.id }}')">
+                                    <i class="fas fa-chart-line"></i>
+                                </button>
+                                <button type="button" class="action-btn" data-bs-toggle="tooltip" title="Kopyala" onclick="duplicateCourse('{{ course.id }}')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button type="button" class="action-btn text-danger" data-bs-toggle="tooltip" title="Sil" onclick="deleteCourse('{{ course.id }}')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Kurs Düzenleme -->
+<div class="modal" id="edit-course-modal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h3>Kurs Düzenle</h3>
+            <button type="button" class="modal-close" data-modal-close>
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <form class="admin-form validate-form" id="edit-course-form" method="POST" action="/admin/kurslar/duzenle">
+                <input type="hidden" id="edit-course-id" name="id">
+                
+                <div class="form-tabs">
+                    <div class="form-tab active" data-tab-target="basic-info">Temel Bilgiler</div>
+                    <div class="form-tab" data-tab-target="description">Açıklama</div>
+                    <div class="form-tab" data-tab-target="media">Medya</div>
+                    <div class="form-tab" data-tab-target="pricing">Fiyatlandırma</div>
+                    <div class="form-tab" data-tab-target="advanced">Gelişmiş</div>
+                </div>
+                
+                <div class="form-tab-content active" data-tab-id="basic-info">
+                    <div class="section-title">Temel Bilgiler</div>
+                    
+                    <div class="form-row">
+                        <div class="admin-form-group col-8">
+                            <label for="course-title">Kurs Başlığı</label>
+                            <input type="text" id="course-title" name="title" class="admin-form-control" required>
+                        </div>
+                        
+                        <div class="admin-form-group col-4">
+                            <label for="course-status">Durum</label>
+                            <select id="course-status" name="status" class="admin-form-control">
+                                <option value="draft">Taslak</option>
+                                <option value="published">Yayında</option>
+                                <option value="archived">Arşivlenmiş</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="admin-form-group col-6">
+                            <label for="course-category">Kategori</label>
+                            <select id="course-category" name="category" class="admin-form-control">
+                                <option value="math">Matematik</option>
+                                <option value="science">Fen Bilgisi</option>
+                                <option value="turkish">Türkçe</option>
+                                <option value="social">Sosyal Bilgiler</option>
+                                <option value="english">İngilizce</option>
+                            </select>
+                        </div>
+                        
+                        <div class="admin-form-group col-6">
+                            <label for="course-sub-category">Alt Kategori</label>
+                            <input type="text" id="course-sub-category" name="sub_category" class="admin-form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="admin-form-group col-6">
+                            <label for="course-level">Seviye</label>
+                            <select id="course-level" name="level" class="admin-form-control">
+                                <option value="1">1. Sınıf</option>
+                                <option value="2">2. Sınıf</option>
+                                <option value="3">3. Sınıf</option>
+                                <option value="4">4. Sınıf</option>
+                                <option value="5">5. Sınıf</option>
+                                <option value="6">6. Sınıf</option>
+                                <option value="7">7. Sınıf</option>
+                                <option value="8">8. Sınıf</option>
+                                <option value="9">9. Sınıf</option>
+                                <option value="10">10. Sınıf</option>
+                                <option value="11">11. Sınıf</option>
+                                <option value="12">12. Sınıf</option>
+                            </select>
+                        </div>
+                        
+                        <div class="admin-form-group col-6">
+                            <label for="course-instructor">Eğitmen</label>
+                            <select id="course-instructor" name="instructor_id" class="admin-form-control">
+                                {% for instructor in instructors %}
+                                <option value="{{ instructor.id }}">{{ instructor.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-tab-content" data-tab-id="description">
+                    <div class="section-title">Kurs Açıklaması ve İçeriği</div>
+                    
+                    <div class="admin-form-group">
+                        <label for="course-description">Kurs Açıklaması</label>
+                        <textarea id="course-description" name="description" class="admin-form-control" rows="6"></textarea>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label>Öğrenme Hedefleri</label>
+                        <div class="tag-input-container" id="learning-objectives-container">
+                            <input type="text" id="learning-objective-input" class="tag-input" placeholder="Enter tuşu ile hedef ekleyin">
+                            <div class="tags-container" id="learning-objectives-tags"></div>
+                            <input type="hidden" name="learning_objectives" id="learning-objectives">
+                        </div>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label>Ön Koşullar</label>
+                        <div class="tag-input-container" id="prerequisites-container">
+                            <input type="text" id="prerequisite-input" class="tag-input" placeholder="Enter tuşu ile ön koşul ekleyin">
+                            <div class="tags-container" id="prerequisites-tags"></div>
+                            <input type="hidden" name="prerequisites" id="prerequisites">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-modal-close>İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: İçerik Yönetimi -->
+<div class="modal" id="course-content-modal">
+    <div class="modal-content modal-xl">
+        <div class="modal-header">
+            <h3>Kurs İçerik Yönetimi: <span id="content-course-title"></span></h3>
+            <button type="button" class="modal-close" data-modal-close>
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="content-manager-container">
+                <div class="content-sidebar">
+                    <button class="btn btn-primary btn-block" id="add-section-btn">
+                        <i class="fas fa-plus"></i> Yeni Bölüm Ekle
+                    </button>
+                    
+                    <div class="content-tree" id="course-content-tree">
+                        <!-- Bölümler ve içerik yapısı burada gösterilecek -->
+                    </div>
+                </div>
+                
+                <div class="content-editor">
+                    <div class="content-editor-header">
+                        <h4 id="editing-content-title">Yeni İçerik</h4>
+                    </div>
+                    
+                    <div class="content-editor-form">
+                        <form id="content-form">
+                            <input type="hidden" id="content-id" name="content_id">
+                            <input type="hidden" id="section-id" name="section_id">
+                            
+                            <div class="admin-form-group">
+                                <label for="content-title">Başlık</label>
+                                <input type="text" id="content-title" name="title" class="admin-form-control" required>
+                            </div>
+                            
+                            <div class="admin-form-group">
+                                <label for="content-type">İçerik Türü</label>
+                                <select id="content-type" name="type" class="admin-form-control">
+                                    <option value="video">Video</option>
+                                    <option value="document">Doküman</option>
+                                    <option value="quiz">Quiz</option>
+                                    <option value="assignment">Ödev</option>
+                                    <option value="presentation">Sunum</option>
+                                </select>
+                            </div>
+                            
+                            <div class="admin-form-group">
+                                <label for="content-description">Açıklama</label>
+                                <textarea id="content-description" name="description" class="admin-form-control" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="content-type-specific" id="video-content">
+                                <div class="admin-form-group">
+                                    <label for="video-url">Video URL</label>
+                                    <input type="text" id="video-url" name="content_url" class="admin-form-control">
+                                </div>
+                                
+                                <div class="admin-form-group">
+                                    <label for="video-duration">Süre (dakika)</label>
+                                    <input type="number" id="video-duration" name="duration_minutes" class="admin-form-control">
+                                </div>
+                            </div>
+                            
+                            <div class="content-type-specific" id="quiz-content" style="display: none;">
+                                <div class="quiz-questions" id="quiz-questions-container">
+                                    <!-- Quiz soruları burada gösterilecek -->
+                                </div>
+                                
+                                <button type="button" class="btn btn-outline" id="add-question-btn">
+                                    <i class="fas fa-plus"></i> Soru Ekle
+                                </button>
+                            </div>
+                            
+                            <div class="admin-form-group">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="content-required" name="is_required" checked>
+                                    <label for="content-required">Tamamlanması zorunlu</label>
+                                </div>
+                            </div>
+                            
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-secondary" id="cancel-content-btn">İptal</button>
+                                <button type="submit" class="btn btn-primary" id="save-content-btn">Kaydet</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Kurs tablosunu filtreleme
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Aktif sekmeyi değiştir
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            const filter = this.dataset.tab;
+            const rows = document.querySelectorAll('#courses-table tbody tr');
+            
+            rows.forEach(row => {
+                if (filter === 'all') {
+                    row.style.display = '';
+                } else {
+                    const status = row.dataset.courseStatus;
+                    row.style.display = (status === filter) ? '' : 'none';
+                }
+            });
+        });
+    });
+    
+    // Kurs arama fonksiyonu
+    document.getElementById('course-search').addEventListener('input', function() {
+        const searchText = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#courses-table tbody tr');
+        
+        rows.forEach(row => {
+            const title = row.querySelector('.course-info-cell strong').textContent.toLowerCase();
+            const category = row.cells[2].textContent.toLowerCase();
+            const instructor = row.cells[3].textContent.toLowerCase();
+            
+            if (title.includes(searchText) || category.includes(searchText) || instructor.includes(searchText)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    
+    // Kurs düzenleme modalı
+    function editCourse(courseId) {
+        // AJAX ile kurs bilgilerini getir
+        fetch(`/admin/api/courses/${courseId}`)
+            .then(response => response.json())
+            .then(course => {
+                // Form alanlarını doldur
+                document.getElementById('edit-course-id').value = course.id;
+                document.getElementById('course-title').value = course.title;
+                document.getElementById('course-status').value = course.status;
+                document.getElementById('course-category').value = course.category;
+                document.getElementById('course-sub-category').value = course.sub_category || '';
+                document.getElementById('course-level').value = course.level;
+                document.getElementById('course-description').value = course.description;
+                
+                // Öğrenme hedefleri ve ön koşullar
+                populateTags('learning-objectives-tags', course.learning_objectives);
+                populateTags('prerequisites-tags', course.prerequisites);
+                
+                // Modalı aç
+                openModal('edit-course-modal');
+            })
+            .catch(error => {
+                console.error('Kurs bilgileri alınamadı:', error);
+                alert('Kurs bilgileri yüklenirken bir hata oluştu.');
+            });
+    }
+    
+    // İçerik yönetimi
+    function manageCourseContent(courseId) {
+        // AJAX ile kurs ve içerik bilgilerini getir
+        fetch(`/admin/api/courses/${courseId}/contents`)
+            .then(response => response.json())
+            .then(data => {
+                // Kurs başlığını ayarla
+                document.getElementById('content-course-title').textContent = data.course.title;
+                
+                // İçerik ağacını oluştur
+                buildContentTree(data.sections);
+                
+                // Modalı aç
+                openModal('course-content-modal');
+            })
+            .catch(error => {
+                console.error('Kurs içeriği alınamadı:', error);
+                alert('Kurs içeriği yüklenirken bir hata oluştu.');
+            });
+    }
+    
+    // Diğer yardımcı fonksiyonlar
+    function populateTags(containerId, tags) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        
+        if (tags && tags.length) {
+            tags.forEach(tag => {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'tag';
+                tagElement.textContent = tag;
+                
+                const removeBtn = document.createElement('i');
+                removeBtn.className = 'fas fa-times remove-tag';
+                removeBtn.onclick = function() {
+                    tagElement.remove();
+                    updateHiddenTagInput(containerId);
+                };
+                
+                tagElement.appendChild(removeBtn);
+                container.appendChild(tagElement);
+            });
+            
+            updateHiddenTagInput(containerId);
+        }
+    }
+    
+    function buildContentTree(sections) {
+        const treeContainer = document.getElementById('course-content-tree');
+        treeContainer.innerHTML = '';
+        
+        sections.forEach(section => {
+            const sectionElement = document.createElement('div');
+            sectionElement.className = 'content-section';
+            sectionElement.dataset.sectionId = section.id;
+            
+            const sectionHeader = document.createElement('div');
+            sectionHeader.className = 'content-section-header';
+            sectionHeader.innerHTML = `
+                <span class="section-title">${section.title}</span>
+                <div class="section-actions">
+                    <button class="action-btn add-content-btn" title="İçerik Ekle">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="action-btn edit-section-btn" title="Düzenle">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete-section-btn" title="Sil">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `;
+            
+            sectionElement.appendChild(sectionHeader);
+            
+            const contentList = document.createElement('div');
+            contentList.className = 'content-items';
+            
+            section.contents.forEach(content => {
+                const contentItem = document.createElement('div');
+                contentItem.className = 'content-item';
+                contentItem.dataset.contentId = content.id;
+                
+                contentItem.innerHTML = `
+                    <span class="content-item-title">
+                        <i class="fas ${getContentTypeIcon(content.type)}"></i>
+                        ${content.title}
+                    </span>
+                    <div class="content-item-actions">
+                        <button class="action-btn edit-content-btn" title="Düzenle">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-content-btn" title="Sil">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                `;
+                
+                contentList.appendChild(contentItem);
+            });
+            
+            sectionElement.appendChild(contentList);
+            treeContainer.appendChild(sectionElement);
+        });
+        
+        // İçerik ağacındaki olayları tanımla
+        attachContentTreeEvents();
+    }
+    
+    function getContentTypeIcon(type) {
+        switch (type) {
+            case 'video': return 'fa-play-circle';
+            case 'document': return 'fa-file-alt';
+            case 'quiz': return 'fa-question-circle';
+            case 'assignment': return 'fa-tasks';
+            case 'presentation': return 'fa-file-powerpoint';
+            default: return 'fa-file';
+        }
+    }
+    
+    function attachContentTreeEvents() {
+        // Bölüm ekleme butonu
+        document.getElementById('add-section-btn').addEventListener('click', function() {
+            // Yeni bölüm ekleme formunu göster
+            document.getElementById('editing-content-title').textContent = 'Yeni Bölüm';
+            document.getElementById('content-form').reset();
+            document.getElementById('section-id').value = '';
+            document.getElementById('content-id').value = '';
+            
+            // Form alanlarını ayarla
+            // ...
+        });
+        
+        // Bölüm düzenleme butonları
+        document.querySelectorAll('.edit-section-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const sectionId = this.closest('.content-section').dataset.sectionId;
+                // Bölüm düzenleme işlemleri
+                // ...
+            });
+        });
+        
+        // İçerik düzenleme butonları
+        document.querySelectorAll('.edit-content-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const contentId = this.closest('.content-item').dataset.contentId;
+                // İçerik düzenleme işlemleri
+                // ...
+            });
+        });
+    }
+    
+    // Modal yardımcıları
+    function openModal(modalId) {
+        document.getElementById(modalId).classList.add('open');
+    }
+    
+    document.querySelectorAll('.modal-close, [data-modal-close]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.closest('.modal').classList.remove('open');
+        });
+    });
+    
+    // Form sekmesi geçiş işlevleri
+    document.querySelectorAll('.form-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const targetTab = this.dataset.tabTarget;
+            
+            // Aktif sekmeyi değiştir
+            document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Sekme içeriğini değiştir
+            document.querySelectorAll('.form-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelector(`.form-tab-content[data-tab-id="${targetTab}"]`).classList.add('active');
+        });
+    });
+    
+    // İçerik türü değiştiğinde uygun form alanlarını göster
+    document.getElementById('content-type').addEventListener('change', function() {
+        const contentType = this.value;
+        
+        // Tüm içerik türü formlarını gizle
+        document.querySelectorAll('.content-type-specific').forEach(el => {
+            el.style.display = 'none';
+        });
+        
+        // Seçilen içerik türüne göre ilgili form alanlarını göster
+        switch (contentType) {
+            case 'video':
+                document.getElementById('video-content').style.display = 'block';
+                break;
+            case 'quiz':
+                document.getElementById('quiz-content').style.display = 'block';
+                break;
+            // Diğer türler için...
+        }
+    });
+</script>
+{% endblock %} 

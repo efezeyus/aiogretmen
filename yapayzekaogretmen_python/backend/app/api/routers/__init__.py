@@ -1,0 +1,1 @@
+from app.api.routers import auth_router, user_router, course_router, ai_router 

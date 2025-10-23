@@ -1,0 +1,126 @@
+.advanced-analytics {
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  color: #fff;
+}
+
+.analytics-header, .overview-cards, .analytics-content {
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  display: inline-block;
+  min-width: 220px;
+}
+
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.card-trend.positive { color: #38ef7d; }
+.card-trend.negative { color: #e74c3c; }
+
+.performance-chart {
+  display: flex;
+  align-items: flex-end;
+  height: 120px;
+  gap: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.chart-bar {
+  width: 18px;
+  border-radius: 6px 6px 0 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+}
+
+.bar-value {
+  position: absolute;
+  top: -22px;
+  font-size: 0.7rem;
+  color: #fff;
+}
+
+.chart-labels {
+  display: flex;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: #fff;
+}
+
+.subject-card {
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 0.5rem;
+  display: inline-block;
+  min-width: 180px;
+}
+
+.score-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5rem auto;
+  background: #fff2;
+}
+
+.score-value {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.strength-bar, .weakness-bar {
+  background: #fff2;
+  border-radius: 6px;
+  height: 8px;
+  margin: 0.5rem 0;
+}
+
+.strength-fill, .weakness-fill {
+  height: 100%;
+  border-radius: 6px;
+}
+
+.recommendation-card {
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 0.5rem;
+  display: inline-block;
+  min-width: 200px;
+}
+
+.export-section {
+  margin-top: 2rem;
+}
+
+.export-btn {
+  margin-right: 1rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  border: none;
+  background: #fff2;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+} 

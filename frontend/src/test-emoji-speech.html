@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Okuma Testi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #5c3cfc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #4a2ed0;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f4f8;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .original {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .processed {
+            color: #333;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎯 Emoji Okuma Test Aracı</h1>
+        
+        <h2>Test Metinleri:</h2>
+        
+        <div id="test1">
+            <p><strong>Test 1:</strong> 🤖 Merhaba Ahmet Yılmaz! Ben Matematik Öğretmeni Maya. Bugün 5. Sınıf Matematik - Kesirler ve Ondalık Sayılar konusunu birlikte öğreneceğiz. Hazır mısın? 🚀</p>
+            <button onclick="testSpeech('test1')">Bu Metni Test Et</button>
+            <div class="result" id="result1"></div>
+        </div>
+
+        <div id="test2">
+            <p><strong>Test 2:</strong> 😊 Harika! Öğrenmeye başlayalım. İlk olarak kesirler nedir? 🤔 Kesir, bir bütünün eşit parçalarından birkaçını gösteren sayılardır.</p>
+            <button onclick="testSpeech('test2')">Bu Metni Test Et</button>
+            <div class="result" id="result2"></div>
+        </div>
+
+        <div id="test3">
+            <p><strong>Test 3:</strong> Aferin! 👏 Çok güzel anladın. Şimdi bir örnek yapalım: 1/2 + 1/4 = ? 🧮</p>
+            <button onclick="testSpeech('test3')">Bu Metni Test Et</button>
+            <div class="result" id="result3"></div>
+        </div>
+
+        <div id="test4">
+            <p><strong>Test 4:</strong> Mükemmel! 🌟 Bugün çok güzel öğrendin. Yarın görüşmek üzere! 👋</p>
+            <button onclick="testSpeech('test4')">Bu Metni Test Et</button>
+            <div class="result" id="result4"></div>
+        </div>
+
+        <h2>Manuel Test:</h2>
+        <textarea id="customText" rows="5" style="width: 100%; padding: 10px; font-size: 16px;">
+🎨 Merhaba! Ben senin AI öğretmenin. 📚 Bugün matematik öğreneceğiz. Hazır mısın? 🚀
+        </textarea>
+        <br>
+        <button onclick="testCustom()">Manuel Metni Test Et</button>
+        <div class="result" id="customResult"></div>
+    </div>
+
+    <script>
+        // EmojiReader sınıfının basitleştirilmiş versiyonu
+        class EmojiReader {
+            constructor() {
+                this.emojiPattern = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1F000}-\u{1F02F}]|[\u{1F0A0}-\u{1F0FF}]|[\u{1F100}-\u{1F64F}]|[\u{1F980}-\u{1F9FF}]|[\u{1FA70}-\u{1FAFF}]/gu;
+            }
+
+            convertEmojisToText(text) {
+                if (!text) return text;
+                
+                // TÜM EMOJİLERİ KALDIR - Hiçbir emoji okunmasın
+                let processedText = text.replace(this.emojiPattern, '');
+                
+                // Çoklu boşlukları temizle
+                processedText = processedText.replace(/\s+/g, ' ').trim();
+                
+                return processedText;
+            }
+
+            optimizeForSpeech(text) {
+                // Önce emojileri kaldır
+                let optimizedText = this.convertEmojisToText(text);
+                
+                // Matematik ve özel semboller için özel durumlar
+                optimizedText = optimizedText
+                    // Matematik sembolleri
+                    .replace(/\+/g, ' artı ')
+                    .replace(/\-(?=\d)/g, ' eksi ') // Sayıdan önce gelen eksi
+                    .replace(/\*/g, ' çarpı ')
+                    .replace(/\//g, ' bölü ')
+                    .replace(/=/g, ' eşittir ')
+                    .replace(/%/g, ' yüzde ')
+                    .replace(/</g, ' küçüktür ')
+                    .replace(/>/g, ' büyüktür ')
+                    
+                    // Para birimleri
+                    .replace(/\$/g, ' dolar ')
+                    .replace(/€/g, ' euro ')
+                    .replace(/£/g, ' sterlin ')
+                    .replace(/₺/g, ' türk lirası ')
+                    
+                    // Kesirler için özel işlem
+                    .replace(/(\d+)\/(\d+)/g, '$1 bölü $2')
+                    
+                    // Özel karakterler
+                    .replace(/@/g, ' at ')
+                    .replace(/#/g, ' numara ')
+                    .replace(/&/g, ' ve ')
+                    
+                    // Parantezleri virgülle değiştir
+                    .replace(/\s*\(\s*/g, ', ')
+                    .replace(/\s*\)\s*/g, ', ')
+                    .replace(/\s*\[\s*/g, ', ')
+                    .replace(/\s*\]\s*/g, ', ')
+                    .replace(/\s*\{\s*/g, ', ')
+                    .replace(/\s*\}\s*/g, ', ')
+                    
+                    // Çoklu boşlukları ve virgülleri temizle
+                    .replace(/\s+/g, ' ')
+                    .replace(/,+/g, ',')
+                    .replace(/,\s*,/g, ',')
+                    .replace(/^\s*,\s*/g, '')
+                    .replace(/\s*,\s*$/g, '');
+                
+                // Noktalama işaretlerini temizle
+                optimizedText = optimizedText
+                    .replace(/\.(?!\s*$)(?!\s+[A-ZÇĞİÖŞÜ])/g, ' ')
+                    .replace(/\.$/, '')
+                    .replace(/:/g, ' ')
+                    .replace(/;/g, ', ');
+                
+                // Kesme ve tırnak işaretlerini kaldır
+                optimizedText = optimizedText
+                    .replace(/'/g, '')
+                    .replace(/"/g, '')
+                    .replace(/"/g, '')
+                    .replace(/"/g, '')
+                    .replace(/'/g, '')
+                    .replace(/'/g, '');
+                
+                // Son temizlik
+                optimizedText = optimizedText
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                
+                return optimizedText;
+            }
+        }
+
+        const emojiReader = new EmojiReader();
+
+        function testSpeech(testId) {
+            const textElement = document.querySelector(`#${testId} p strong`).nextSibling;
+            const originalText = textElement.textContent.trim();
+            const processedText = emojiReader.optimizeForSpeech(originalText);
+            
+            const resultDiv = document.getElementById(`result${testId.replace('test', '')}`);
+            resultDiv.innerHTML = `
+                <div class="original">Orijinal: ${originalText}</div>
+                <div class="processed">İşlenmiş: ${processedText}</div>
+            `;
+            
+            // Tarayıcı ses sentezi ile test
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(processedText);
+                utterance.lang = 'tr-TR';
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function testCustom() {
+            const originalText = document.getElementById('customText').value;
+            const processedText = emojiReader.optimizeForSpeech(originalText);
+            
+            const resultDiv = document.getElementById('customResult');
+            resultDiv.innerHTML = `
+                <div class="original">Orijinal: ${originalText}</div>
+                <div class="processed">İşlenmiş: ${processedText}</div>
+            `;
+            
+            // Tarayıcı ses sentezi ile test
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(processedText);
+                utterance.lang = 'tr-TR';
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+    </script>
+</body>
+</html>

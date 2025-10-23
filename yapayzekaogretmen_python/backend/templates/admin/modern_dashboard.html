@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yapay Zeka Öğretmen - Admin Panel</title>
+    
+    <!-- CSS Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --secondary-color: #7C3AED;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --dark-bg: #1F2937;
+            --sidebar-width: 280px;
+        }
+        
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #4B5563 #1F2937;
+        }
+        
+        *::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        *::-webkit-scrollbar-track {
+            background: #1F2937;
+        }
+        
+        *::-webkit-scrollbar-thumb {
+            background-color: #4B5563;
+            border-radius: 4px;
+        }
+        
+        .sidebar {
+            width: var(--sidebar-width);
+            transition: all 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar.collapsed {
+            width: 80px;
+        }
+        
+        .main-content {
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+        
+        .main-content.expanded {
+            margin-left: 80px;
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+            opacity: 0;
+        }
+        
+        .stat-card:hover::before {
+            animation: shine 0.6s ease;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .metric-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .metric-change.positive {
+            color: var(--success-color);
+        }
+        
+        .metric-change.negative {
+            color: var(--danger-color);
+        }
+        
+        .nav-item {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary-color);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 9999px;
+            padding: 2px 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.875rem;
+            color: var(--success-color);
+        }
+        
+        .live-indicator::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--success-color);
+            border-radius: 50%;
+            animation: live-pulse 1.5s infinite;
+        }
+        
+        @keyframes live-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+            transition: stroke-dashoffset 0.5s ease;
+        }
+        
+        .health-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .health-indicator.healthy {
+            background: var(--success-color);
+            box-shadow: 0 0 10px var(--success-color);
+        }
+        
+        .health-indicator.warning {
+            background: var(--warning-color);
+            box-shadow: 0 0 10px var(--warning-color);
+        }
+        
+        .health-indicator.critical {
+            background: var(--danger-color);
+            box-shadow: 0 0 10px var(--danger-color);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <!-- Sidebar -->
+    <aside class="sidebar fixed left-0 top-0 h-full bg-gray-900 text-white z-40">
+        <div class="p-6">
+            <!-- Logo -->
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-brain text-white text-xl"></i>
+                    </div>
+                    <h1 class="text-xl font-bold sidebar-text">AI Öğretmen</h1>
+                </div>
+                <button id="sidebarToggle" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="space-y-2">
+                <a href="#dashboard" class="nav-item active flex items-center px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-home w-6"></i>
+                    <span class="ml-3 sidebar-text">Dashboard</span>
+                </a>
+                
+                <a href="#ai-performance" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-robot w-6"></i>
+                    <span class="ml-3 sidebar-text">AI Performans</span>
+                </a>
+                
+                <a href="#users" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-users w-6"></i>
+                    <span class="ml-3 sidebar-text">Kullanıcılar</span>
+                </a>
+                
+                <a href="#lessons" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-book w-6"></i>
+                    <span class="ml-3 sidebar-text">Dersler</span>
+                </a>
+                
+                <a href="#ab-tests" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors relative">
+                    <i class="fas fa-flask w-6"></i>
+                    <span class="ml-3 sidebar-text">A/B Testler</span>
+                    <span class="notification-badge">2</span>
+                </a>
+                
+                <a href="#training" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-graduation-cap w-6"></i>
+                    <span class="ml-3 sidebar-text">Fine-tuning</span>
+                </a>
+                
+                <a href="#analytics" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-chart-line w-6"></i>
+                    <span class="ml-3 sidebar-text">Analitik</span>
+                </a>
+                
+                <a href="#security" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-shield-alt w-6"></i>
+                    <span class="ml-3 sidebar-text">Güvenlik</span>
+                </a>
+                
+                <a href="#logs" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-file-alt w-6"></i>
+                    <span class="ml-3 sidebar-text">Loglar</span>
+                </a>
+                
+                <a href="#settings" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-cog w-6"></i>
+                    <span class="ml-3 sidebar-text">Ayarlar</span>
+                </a>
+            </nav>
+            
+            <!-- User Info -->
+            <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-800">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="sidebar-text">
+                        <p class="text-sm font-medium">Admin User</p>
+                        <p class="text-xs text-gray-400">admin@example.com</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200">
+            <div class="px-8 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Admin Dashboard</h2>
+                        <p class="text-sm text-gray-500 mt-1">
+                            <span class="live-indicator">Canlı Veri</span>
+                            <span class="text-gray-400 ml-2">Son güncelleme: <span id="lastUpdate">şimdi</span></span>
+                        </p>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <!-- Search -->
+                        <div class="relative">
+                            <input type="text" placeholder="Ara..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        
+                        <!-- Notifications -->
+                        <button class="relative p-2 text-gray-600 hover:text-gray-800">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="notification-badge">5</span>
+                        </button>
+                        
+                        <!-- Quick Actions -->
+                        <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                            <i class="fas fa-plus mr-2"></i>
+                            Yeni İşlem
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Dashboard Content -->
+        <div class="p-8">
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Total Users -->
+                <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users text-blue-600 text-xl"></i>
+                        </div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>12.5%</span>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800" id="totalUsers">2,847</h3>
+                    <p class="text-sm text-gray-500 mt-1">Toplam Kullanıcı</p>
+                </div>
+                
+                <!-- Active Users -->
+                <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user-check text-green-600 text-xl"></i>
+                        </div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>8.3%</span>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800" id="activeUsers">1,923</h3>
+                    <p class="text-sm text-gray-500 mt-1">Aktif Kullanıcı</p>
+                </div>
+                
+                <!-- AI Satisfaction -->
+                <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-smile text-purple-600 text-xl"></i>
+                        </div>
+                        <div class="metric-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>2.1%</span>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800" id="aiSatisfaction">87.4%</h3>
+                    <p class="text-sm text-gray-500 mt-1">AI Memnuniyet</p>
+                </div>
+                
+                <!-- System Health -->
+                <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-heartbeat text-emerald-600 text-xl"></i>
+                        </div>
+                        <span class="health-indicator healthy"></span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800">%98.7</h3>
+                    <p class="text-sm text-gray-500 mt-1">Sistem Sağlığı</p>
+                </div>
+            </div>
+            
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- User Growth Chart -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Kullanıcı Büyümesi</h3>
+                        <select class="text-sm border border-gray-300 rounded px-3 py-1">
+                            <option>Son 7 Gün</option>
+                            <option>Son 30 Gün</option>
+                            <option>Son 3 Ay</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="userGrowthChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- AI Performance Chart -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">AI Model Performansı</h3>
+                        <button class="text-sm text-indigo-600 hover:text-indigo-700">
+                            Detaylar →
+                        </button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="aiPerformanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tables Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Recent Activities -->
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Son Aktiviteler</h3>
+                        <button class="text-sm text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-sync-alt mr-1"></i>
+                            Yenile
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-user-plus text-blue-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-800">Yeni kullanıcı kaydı</p>
+                                <p class="text-xs text-gray-500">Ahmet Yılmaz - 2 dakika önce</p>
+                            </div>
+                            <span class="text-xs text-gray-400">14:32</span>
+                        </div>
+                        
+                        <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-robot text-green-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-800">AI Model güncellendi</p>
+                                <p class="text-xs text-gray-500">DeepSeek-V3 aktif edildi</p>
+                            </div>
+                            <span class="text-xs text-gray-400">14:28</span>
+                        </div>
+                        
+                        <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-flask text-purple-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-800">A/B Test tamamlandı</p>
+                                <p class="text-xs text-gray-500">Model karşılaştırması sonuçlandı</p>
+                            </div>
+                            <span class="text-xs text-gray-400">14:15</span>
+                        </div>
+                        
+                        <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                            <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-800">Sistem uyarısı</p>
+                                <p class="text-xs text-gray-500">CPU kullanımı %85'i aştı</p>
+                            </div>
+                            <span class="text-xs text-gray-400">13:45</span>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full mt-4 text-center text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+                        Tümünü Göster
+                    </button>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Hızlı İşlemler</h3>
+                    
+                    <div class="space-y-3">
+                        <button class="w-full bg-indigo-600 text-white px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center">
+                            <i class="fas fa-sync-alt mr-2"></i>
+                            Model Yenile
+                        </button>
+                        
+                        <button class="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+                            <i class="fas fa-play mr-2"></i>
+                            Training Başlat
+                        </button>
+                        
+                        <button class="w-full bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center">
+                            <i class="fas fa-flask mr-2"></i>
+                            A/B Test Oluştur
+                        </button>
+                        
+                        <button class="w-full bg-gray-600 text-white px-4 py-3 rounded-lg hover:bg-gray-700 transition-colors flex items-center justify-center">
+                            <i class="fas fa-download mr-2"></i>
+                            Rapor İndir
+                        </button>
+                    </div>
+                    
+                    <div class="mt-6 p-4 bg-yellow-50 rounded-lg">
+                        <h4 class="text-sm font-semibold text-yellow-800 mb-2">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Sistem Durumu
+                        </h4>
+                        <div class="space-y-2 text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">CPU:</span>
+                                <span class="font-medium">45%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">RAM:</span>
+                                <span class="font-medium">67%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Disk:</span>
+                                <span class="font-medium">32%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- JavaScript -->
+    <script>
+        // Sidebar Toggle
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            
+            sidebarTexts.forEach(text => {
+                if (sidebar.classList.contains('collapsed')) {
+                    text.style.display = 'none';
+                } else {
+                    setTimeout(() => {
+                        text.style.display = 'block';
+                    }, 150);
+                }
+            });
+        });
+        
+        // Navigation
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+        
+        // User Growth Chart
+        const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+        const userGrowthChart = new Chart(userGrowthCtx, {
+            type: 'line',
+            data: {
+                labels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
+                datasets: [{
+                    label: 'Yeni Kullanıcılar',
+                    data: [65, 78, 90, 81, 96, 110, 125],
+                    borderColor: 'rgb(79, 70, 229)',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Aktif Kullanıcılar',
+                    data: [820, 850, 870, 890, 920, 950, 980],
+                    borderColor: 'rgb(16, 185, 129)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // AI Performance Chart
+        const aiPerformanceCtx = document.getElementById('aiPerformanceChart').getContext('2d');
+        const aiPerformanceChart = new Chart(aiPerformanceCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['DeepSeek-V3', 'GPT-3.5', 'DeepSeek-R1', 'Diğer'],
+                datasets: [{
+                    data: [45, 30, 20, 5],
+                    backgroundColor: [
+                        'rgb(79, 70, 229)',
+                        'rgb(16, 185, 129)',
+                        'rgb(245, 158, 11)',
+                        'rgb(107, 114, 128)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        
+        // Update Last Update Time
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('tr-TR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            document.getElementById('lastUpdate').textContent = timeString;
+        }
+        
+        setInterval(updateLastUpdateTime, 60000); // Update every minute
+        
+        // Fetch Dashboard Data
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch('/api/admin/dashboard/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateDashboardStats(data);
+                }
+            } catch (error) {
+                console.error('Dashboard veri hatası:', error);
+            }
+        }
+        
+        // Update Dashboard Stats
+        function updateDashboardStats(data) {
+            // Update stat cards
+            document.getElementById('totalUsers').textContent = data.users.total.toLocaleString();
+            document.getElementById('activeUsers').textContent = data.users.active.toLocaleString();
+            document.getElementById('aiSatisfaction').textContent = `${(data.ai_metrics.satisfaction_rate * 100).toFixed(1)}%`;
+            
+            // Update charts if needed
+            updateLastUpdateTime();
+        }
+        
+        // Auto refresh every 30 seconds
+        setInterval(fetchDashboardData, 30000);
+        
+        // Initial load
+        fetchDashboardData();
+    </script>
+</body>
+</html>

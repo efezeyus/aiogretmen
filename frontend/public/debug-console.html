@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Console</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f0f0f0;
+        }
+        .debug-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #5c3cfc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #4730d3;
+        }
+        .log {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Console</h1>
+    
+    <div class="debug-section">
+        <h2>1. LocalStorage Kontrolü</h2>
+        <button onclick="checkLocalStorage()">LocalStorage'ı Kontrol Et</button>
+        <div id="localStorageLog" class="log"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>2. Test Giriş Yap</h2>
+        <button onclick="testLogin()">Test Öğrenci Girişi Yap</button>
+        <div id="loginLog" class="log"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>3. Dashboard'a Git</h2>
+        <button onclick="goToDashboard()">Student Dashboard'a Git</button>
+        <div id="dashboardLog" class="log"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>4. Console Logları</h2>
+        <button onclick="clearConsole()">Console'u Temizle</button>
+        <button onclick="showConsoleLogs()">Console Loglarını Göster</button>
+        <div id="consoleLog" class="log"></div>
+    </div>
+
+    <script>
+        function checkLocalStorage() {
+            const log = document.getElementById('localStorageLog');
+            const userType = localStorage.getItem('userType');
+            const userRole = localStorage.getItem('userRole');
+            const userName = localStorage.getItem('userName');
+            const authToken = localStorage.getItem('authToken');
+            const userEmail = localStorage.getItem('userEmail');
+            const userId = localStorage.getItem('userId');
+            
+            log.textContent = `LocalStorage İçeriği:
+userType: ${userType}
+userRole: ${userRole}
+userName: ${userName}
+authToken: ${authToken ? 'Mevcut' : 'Yok'}
+userEmail: ${userEmail}
+userId: ${userId}
+
+Tüm localStorage:
+${JSON.stringify(localStorage, null, 2)}`;
+        }
+        
+        function testLogin() {
+            const log = document.getElementById('loginLog');
+            
+            // Test öğrenci verileri
+            localStorage.setItem('userType', 'student');
+            localStorage.setItem('userRole', 'student');
+            localStorage.setItem('userName', 'Ahmet Yılmaz');
+            localStorage.setItem('authToken', 'test_token_1_ahmet.yilmaz@okul.com');
+            localStorage.setItem('userEmail', 'ahmet.yilmaz@okul.com');
+            localStorage.setItem('userId', '1');
+            
+            log.textContent = '✅ Test öğrenci bilgileri kaydedildi!\n\nKaydedilen veriler:\n' + 
+                JSON.stringify({
+                    userType: 'student',
+                    userRole: 'student',
+                    userName: 'Ahmet Yılmaz',
+                    authToken: 'test_token_1_ahmet.yilmaz@okul.com',
+                    userEmail: 'ahmet.yilmaz@okul.com',
+                    userId: '1'
+                }, null, 2);
+        }
+        
+        function goToDashboard() {
+            const log = document.getElementById('dashboardLog');
+            
+            // Önce localStorage'ı kontrol et
+            const userType = localStorage.getItem('userType');
+            
+            if (userType === 'student') {
+                log.textContent = '✅ Öğrenci olarak giriş yapılmış. Dashboard\'a yönlendiriliyor...';
+                setTimeout(() => {
+                    window.location.href = '/student/dashboard';
+                }, 1000);
+            } else {
+                log.textContent = '❌ Öğrenci olarak giriş yapılmamış. Lütfen önce test girişi yapın.';
+            }
+        }
+        
+        function clearConsole() {
+            console.clear();
+            document.getElementById('consoleLog').textContent = 'Console temizlendi.';
+        }
+        
+        function showConsoleLogs() {
+            // Bu fonksiyon console loglarını yakalayamaz çünkü browser güvenlik kısıtlamaları var
+            // Ama kullanıcıya console'u kontrol etmesini söyleyebiliriz
+            document.getElementById('consoleLog').textContent = 
+                'Console loglarını görmek için:\n' +
+                '1. F12 tuşuna basın\n' +
+                '2. Console sekmesini açın\n' +
+                '3. Sayfayı yenileyin\n' +
+                '4. Hataları kontrol edin';
+        }
+        
+        // Sayfa yüklendiğinde localStorage'ı kontrol et
+        window.onload = function() {
+            checkLocalStorage();
+            console.log('🔍 Debug Console sayfası yüklendi');
+        };
+    </script>
+</body>
+</html>

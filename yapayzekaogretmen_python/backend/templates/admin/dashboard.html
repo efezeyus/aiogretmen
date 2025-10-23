@@ -1,0 +1,279 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard - Admin Panel | Yapay Zeka Öğretmen{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- İstatistik Kartları -->
+<div class="stat-cards">
+    <div class="stat-card primary">
+        <div class="stat-card-content">
+            <h3>Toplam Kullanıcı</h3>
+            <p class="stat-number">{{ stats.total_users }}</p>
+            <p class="stat-change increase">
+                <i class="fas fa-arrow-up"></i> {{ stats.user_growth }}% geçen aya göre
+            </p>
+        </div>
+        <div class="stat-card-icon">
+            <i class="fas fa-users"></i>
+        </div>
+    </div>
+    
+    <div class="stat-card success">
+        <div class="stat-card-content">
+            <h3>Aktif Abonelikler</h3>
+            <p class="stat-number">{{ stats.active_subscriptions }}</p>
+            <p class="stat-change increase">
+                <i class="fas fa-arrow-up"></i> {{ stats.subscription_growth }}% geçen aya göre
+            </p>
+        </div>
+        <div class="stat-card-icon">
+            <i class="fas fa-user-check"></i>
+        </div>
+    </div>
+    
+    <div class="stat-card info">
+        <div class="stat-card-content">
+            <h3>Tamamlanan Dersler</h3>
+            <p class="stat-number">{{ stats.completed_lessons }}</p>
+            <p class="stat-change increase">
+                <i class="fas fa-arrow-up"></i> {{ stats.lesson_growth }}% geçen aya göre
+            </p>
+        </div>
+        <div class="stat-card-icon">
+            <i class="fas fa-book-reader"></i>
+        </div>
+    </div>
+    
+    <div class="stat-card warning">
+        <div class="stat-card-content">
+            <h3>Aylık Gelir</h3>
+            <p class="stat-number">{{ stats.monthly_revenue }} ₺</p>
+            <p class="stat-change increase">
+                <i class="fas fa-arrow-up"></i> {{ stats.revenue_growth }}% geçen aya göre
+            </p>
+        </div>
+        <div class="stat-card-icon">
+            <i class="fas fa-money-bill-wave"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Grafikler -->
+<div class="chart-containers">
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h3>Kullanıcı İstatistikleri</h3>
+            <div class="card-actions">
+                <select id="user-stats-timeframe">
+                    <option value="week">Bu Hafta</option>
+                    <option value="month" selected>Bu Ay</option>
+                    <option value="year">Bu Yıl</option>
+                </select>
+            </div>
+        </div>
+        <div class="admin-card-body">
+            <canvas id="user-stats-chart"></canvas>
+        </div>
+    </div>
+    
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h3>Ders Tamamlama İstatistikleri</h3>
+            <div class="card-actions">
+                <select id="lesson-stats-category">
+                    <option value="all" selected>Tüm Dersler</option>
+                    <option value="math">Matematik</option>
+                    <option value="science">Fen Bilgisi</option>
+                    <option value="turkish">Türkçe</option>
+                    <option value="social">Sosyal Bilgiler</option>
+                </select>
+            </div>
+        </div>
+        <div class="admin-card-body">
+            <canvas id="lesson-stats-chart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Son Etkinlikler -->
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h3>Son Kullanıcı Etkinlikleri</h3>
+        <div class="card-actions">
+            <a href="/admin/etkinlikler" class="btn btn-sm btn-outline">Tümünü Gör</a>
+        </div>
+    </div>
+    <div class="admin-card-body">
+        <div class="admin-table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Kullanıcı</th>
+                        <th>Etkinlik</th>
+                        <th>Ders</th>
+                        <th>Tarih</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in recent_activities %}
+                    <tr>
+                        <td>
+                            <div class="user-info-cell">
+                                <img src="{{ activity.user_avatar }}" alt="{{ activity.user_name }}" class="avatar-small">
+                                <span>{{ activity.user_name }}</span>
+                            </div>
+                        </td>
+                        <td>{{ activity.action }}</td>
+                        <td>{{ activity.lesson }}</td>
+                        <td>{{ activity.date }}</td>
+                        <td>
+                            <span class="status-badge {{ activity.status }}">{{ activity.status_text }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Son Ödemeler -->
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h3>Son Ödemeler</h3>
+        <div class="card-actions">
+            <a href="/admin/odemeler" class="btn btn-sm btn-outline">Tümünü Gör</a>
+        </div>
+    </div>
+    <div class="admin-card-body">
+        <div class="admin-table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>İşlem No</th>
+                        <th>Kullanıcı</th>
+                        <th>Paket</th>
+                        <th>Tutar</th>
+                        <th>Tarih</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in recent_payments %}
+                    <tr>
+                        <td>#{{ payment.id }}</td>
+                        <td>{{ payment.user_name }}</td>
+                        <td>{{ payment.package }}</td>
+                        <td>{{ payment.amount }} ₺</td>
+                        <td>{{ payment.date }}</td>
+                        <td>
+                            <span class="status-badge {{ payment.status }}">{{ payment.status_text }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Kullanıcı istatistikleri grafiği
+        const userStatsCanvas = document.getElementById('user-stats-chart');
+        const userStatsChart = new Chart(userStatsCanvas, {
+            type: 'line',
+            data: {
+                labels: {{ user_stats.labels | tojson }},
+                datasets: [{
+                    label: 'Yeni Kullanıcılar',
+                    data: {{ user_stats.new_users | tojson }},
+                    backgroundColor: 'rgba(78, 84, 200, 0.2)',
+                    borderColor: 'rgba(78, 84, 200, 1)',
+                    borderWidth: 2,
+                    tension: 0.3
+                }, {
+                    label: 'Aktif Kullanıcılar',
+                    data: {{ user_stats.active_users | tojson }},
+                    backgroundColor: 'rgba(93, 170, 224, 0.2)',
+                    borderColor: 'rgba(93, 170, 224, 1)',
+                    borderWidth: 2,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Ders tamamlama istatistikleri grafiği
+        const lessonStatsCanvas = document.getElementById('lesson-stats-chart');
+        const lessonStatsChart = new Chart(lessonStatsCanvas, {
+            type: 'bar',
+            data: {
+                labels: {{ lesson_stats.labels | tojson }},
+                datasets: [{
+                    label: 'Tamamlanan Dersler',
+                    data: {{ lesson_stats.completed | tojson }},
+                    backgroundColor: [
+                        'rgba(78, 84, 200, 0.6)',
+                        'rgba(93, 170, 224, 0.6)',
+                        'rgba(40, 167, 69, 0.6)',
+                        'rgba(255, 193, 7, 0.6)',
+                        'rgba(220, 53, 69, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(78, 84, 200, 1)',
+                        'rgba(93, 170, 224, 1)',
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(220, 53, 69, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Zaman aralığı değiştiğinde grafiği güncelle
+        document.getElementById('user-stats-timeframe').addEventListener('change', function() {
+            fetch(`/admin/api/user-stats?timeframe=${this.value}`)
+                .then(response => response.json())
+                .then(data => {
+                    userStatsChart.data.labels = data.labels;
+                    userStatsChart.data.datasets[0].data = data.new_users;
+                    userStatsChart.data.datasets[1].data = data.active_users;
+                    userStatsChart.update();
+                });
+        });
+        
+        // Ders kategorisi değiştiğinde grafiği güncelle
+        document.getElementById('lesson-stats-category').addEventListener('change', function() {
+            fetch(`/admin/api/lesson-stats?category=${this.value}`)
+                .then(response => response.json())
+                .then(data => {
+                    lessonStatsChart.data.labels = data.labels;
+                    lessonStatsChart.data.datasets[0].data = data.completed;
+                    lessonStatsChart.update();
+                });
+        });
+    });
+</script>
+{% endblock %} 

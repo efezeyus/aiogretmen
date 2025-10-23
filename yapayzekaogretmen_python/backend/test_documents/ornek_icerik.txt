@@ -1,0 +1,38 @@
+5. SINIF MATEMATİK DERSİ ÖRNEK İÇERİK
+
+1. ÜNİTE: DOĞAL SAYILAR
+
+Konu: Doğal Sayılar ve Basamak Değeri
+
+Doğal sayılar, 0'dan başlayarak sonsuza kadar giden sayılardır. 
+0, 1, 2, 3, 4, 5, ... şeklinde devam eder.
+
+Basamak Değeri:
+Her rakamın bulunduğu yere göre bir değeri vardır.
+
+Örnek: 3456 sayısında
+- 3 binler basamağında = 3000
+- 4 yüzler basamağında = 400  
+- 5 onlar basamağında = 50
+- 6 birler basamağında = 6
+
+2. ÜNİTE: KESİRLER
+
+Konu: Kesir Kavramı
+
+Kesir, bir bütünün eşit parçalarından bir veya birkaçını gösteren sayıdır.
+
+Örnek: 3/4 kesrinde
+- 3 pay (üstteki sayı)
+- 4 payda (alttaki sayı)
+
+Bu kesir "dörtte üç" olarak okunur.
+
+3. ÜNİTE: GEOMETRİK ŞEKİLLER
+
+Konu: Temel Geometrik Şekiller
+
+1. Kare: Dört kenarı eşit, dört açısı 90 derece
+2. Dikdörtgen: Karşılıklı kenarları eşit, dört açısı 90 derece
+3. Üçgen: Üç kenarı ve üç açısı olan şekil
+4. Daire: Merkezden eşit uzaklıktaki noktaların oluşturduğu şekil

@@ -1,0 +1,138 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/admin" class="logo">
+                <img src="{{ url_for('static', path='/img/logo.svg') }}" alt="Yapay Zeka Öğretmen Logo" width="40">
+                <span>YZ Öğretmen</span>
+            </a>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li><a href="/admin" class="{{ 'active' if request.path == '/admin' else '' }}">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a></li>
+            <li><a href="/admin/kullanicilar" class="{{ 'active' if '/admin/kullanicilar' in request.path else '' }}">
+                <i class="fas fa-users"></i> Kullanıcılar
+            </a></li>
+            
+            <!-- Kurslar Menüsü -->
+            <li class="menu-dropdown">
+                <a href="#" class="{{ 'active' if '/admin/kurslar' in request.path else '' }}">
+                    <i class="fas fa-book"></i> Kurslar <i class="fas fa-chevron-down menu-dropdown-icon"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="/admin/kurslar" class="{{ 'active' if request.path == '/admin/kurslar' else '' }}">
+                        <i class="fas fa-list"></i> Tüm Kurslar
+                    </a></li>
+                    <li><a href="/admin/kurslar/yeni" class="{{ 'active' if request.path == '/admin/kurslar/yeni' else '' }}">
+                        <i class="fas fa-plus"></i> Yeni Kurs
+                    </a></li>
+                    <li><a href="/admin/kurslar/kategoriler" class="{{ 'active' if request.path == '/admin/kurslar/kategoriler' else '' }}">
+                        <i class="fas fa-tags"></i> Kategoriler
+                    </a></li>
+                    <li><a href="/admin/kurslar/sertifikalar" class="{{ 'active' if request.path == '/admin/kurslar/sertifikalar' else '' }}">
+                        <i class="fas fa-certificate"></i> Sertifikalar
+                    </a></li>
+                </ul>
+            </li>
+            
+            <!-- Yapay Zeka Menüsü -->
+            <li class="menu-dropdown">
+                <a href="#" class="{{ 'active' if '/admin/ai' in request.path else '' }}">
+                    <i class="fas fa-robot"></i> Yapay Zeka <i class="fas fa-chevron-down menu-dropdown-icon"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="/admin/ai/asistanlar" class="{{ 'active' if request.path == '/admin/ai/asistanlar' else '' }}">
+                        <i class="fas fa-comment-dots"></i> Asistanlar
+                    </a></li>
+                    <li><a href="/admin/ai/quiz-olusturucu" class="{{ 'active' if request.path == '/admin/ai/quiz-olusturucu' else '' }}">
+                        <i class="fas fa-question-circle"></i> Quiz Oluşturucu
+                    </a></li>
+                    <li><a href="/admin/ai/analizler" class="{{ 'active' if request.path == '/admin/ai/analizler' else '' }}">
+                        <i class="fas fa-chart-pie"></i> Öğrenme Analizleri
+                    </a></li>
+                    <li><a href="/admin/ai/ogrenme-yollari" class="{{ 'active' if request.path == '/admin/ai/ogrenme-yollari' else '' }}">
+                        <i class="fas fa-route"></i> Öğrenme Yolları
+                    </a></li>
+                    <li><a href="/admin/ai/ayarlar" class="{{ 'active' if request.path == '/admin/ai/ayarlar' else '' }}">
+                        <i class="fas fa-sliders-h"></i> Yapay Zeka Ayarları
+                    </a></li>
+                </ul>
+            </li>
+            
+            <li><a href="/admin/dersler" class="{{ 'active' if '/admin/dersler' in request.path else '' }}">
+                <i class="fas fa-book"></i> Dersler
+            </a></li>
+            <li><a href="/admin/mufredat" class="{{ 'active' if '/admin/mufredat' in request.path else '' }}">
+                <i class="fas fa-graduation-cap"></i> Müfredat
+            </a></li>
+            <li><a href="/admin/odemeler" class="{{ 'active' if '/admin/odemeler' in request.path else '' }}">
+                <i class="fas fa-credit-card"></i> Ödemeler
+            </a></li>
+            <li><a href="/admin/raporlar" class="{{ 'active' if '/admin/raporlar' in request.path else '' }}">
+                <i class="fas fa-chart-bar"></i> Raporlar
+            </a></li>
+            <li><a href="/admin/ayarlar" class="{{ 'active' if '/admin/ayarlar' in request.path else '' }}">
+                <i class="fas fa-cog"></i> Ayarlar
+            </a></li>
+            <li><a href="/admin/loglar" class="{{ 'active' if '/admin/loglar' in request.path else '' }}">
+                <i class="fas fa-list"></i> Sistem Logları
+            </a></li>
+            <li><a href="/cikis">
+                <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+            </a></li>
+        </ul>
+    </aside>
+    
+    <!-- Ana İçerik -->
+    <div class="admin-content">
+        <!-- Üst Başlık -->
+        <header class="admin-header">
+            <h1 class="admin-title">{% block page_title %}{{ page_title | default('Admin Panel') }}{% endblock %}</h1>
+            
+            <div class="admin-user-menu">
+                <span>Hoş geldiniz, {{ current_user.name }}</span>
+                <a href="/admin/profil" class="avatar">
+                    <img src="{{ url_for('static', path='/img/admin-avatar.jpg') }}" alt="Admin Avatar">
+                </a>
+            </div>
+        </header>
+        
+        <!-- Sayfa İçeriği -->
+        <div class="admin-page-content">
+            {% block admin_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Sidebar menü dropdown işlevi
+document.addEventListener('DOMContentLoaded', function() {
+    const menuDropdowns = document.querySelectorAll('.menu-dropdown > a');
+    
+    menuDropdowns.forEach(function(dropdown) {
+        dropdown.addEventListener('click', function(e) {
+            e.preventDefault();
+            const parent = this.parentElement;
+            parent.classList.toggle('open');
+        });
+    });
+    
+    // Aktif menüyü otomatik aç
+    const activeSubmenu = document.querySelector('.submenu a.active');
+    if (activeSubmenu) {
+        const parentDropdown = activeSubmenu.closest('.menu-dropdown');
+        if (parentDropdown) {
+            parentDropdown.classList.add('open');
+        }
+    }
+});
+</script>
+{% block admin_js %}{% endblock %}
+{% endblock %} 

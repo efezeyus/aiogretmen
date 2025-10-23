@@ -1,0 +1,57 @@
+# Yapay Zeka Öğretmen - Hafif Gereksinimler (Python 3.13 uyumlu)
+
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Veritabanı
+motor==3.3.2
+pymongo==4.6.1
+sqlalchemy==2.0.25
+psycopg2-binary==2.9.9
+beanie==1.25.0
+
+# Redis
+redis==5.0.1
+
+# Kimlik Doğrulama ve Güvenlik
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+pyjwt==2.8.0
+bcrypt==4.1.2
+cryptography==41.0.7
+
+# Yapay Zeka
+openai==1.10.0
+tiktoken==0.5.2
+
+# PDF İşleme
+pypdf==3.17.4
+Pillow>=10.4.0
+
+# Yardımcı Kütüphaneler
+loguru==0.7.2
+python-dotenv==1.0.0
+email-validator==2.1.0.post1
+httpx==0.26.0
+aiofiles==23.2.1
+
+# GraphQL
+strawberry-graphql[fastapi]==0.217.1
+
+# WebSocket
+websockets==12.0
+python-socketio==5.11.0
+
+# Search
+elasticsearch==8.11.1
+
+# Test
+pytest==7.4.4
+pytest-asyncio==0.23.3
+
+# CORS
+fastapi-cors==0.0.6

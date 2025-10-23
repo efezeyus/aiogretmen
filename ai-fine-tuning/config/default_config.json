@@ -1,0 +1,43 @@
+{
+  "model": {
+    "base_model": "gpt-3.5-turbo",
+    "suffix": "meb-ogretmen",
+    "temperature": 0.7,
+    "max_tokens": 800
+  },
+  "training": {
+    "n_epochs": 3,
+    "batch_size": 1,
+    "learning_rate_multiplier": 0.1,
+    "validation_split": 0.1,
+    "prompt_loss_weight": 0.1
+  },
+  "data": {
+    "augmentation": true,
+    "max_tokens_per_conversation": 4096,
+    "sample_size": 0,
+    "min_examples": 10,
+    "max_examples": 50000
+  },
+  "validation": {
+    "test_on_completion": true,
+    "test_prompts": [
+      "5. sınıf kesirler konusunu anlat",
+      "8. sınıf Pisagor teoremi nedir?",
+      "3. sınıf çarpma işlemi nasıl yapılır?",
+      "11. sınıf türev konusu",
+      "6. sınıf vücudumuzda sistemler"
+    ],
+    "success_threshold": 0.8
+  },
+  "monitoring": {
+    "check_interval": 30,
+    "enable_notifications": false,
+    "log_level": "INFO"
+  },
+  "cost": {
+    "max_training_cost": 10.0,
+    "warn_threshold": 5.0,
+    "currency": "USD"
+  }
+} 

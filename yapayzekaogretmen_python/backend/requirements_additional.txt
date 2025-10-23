@@ -1,0 +1,23 @@
+# Ekstra paketler
+langchain
+langchain-community
+langchain-openai
+chromadb
+faiss-cpu
+sentence-transformers
+celery[redis]
+twilio
+strawberry-graphql[fastapi]
+firebase-admin
+sendgrid
+babel
+pydub
+SpeechRecognition
+gtts
+opencv-python
+scikit-learn
+numpy
+pandas
+prometheus-client
+websocket-client
+pinecone

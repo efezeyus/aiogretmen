@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tahta Test - Yapay Zeka Öğretmen</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+        .demo-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .demo-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .problem-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .problem-card:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        .problem-card h3 {
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .problem-card p {
+            color: #666;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .canvas-container {
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 12px;
+            height: 500px;
+            position: relative;
+            margin: 20px 0;
+        }
+        #whiteboard {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+        .toolbar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+        }
+        .tool-btn {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s ease;
+        }
+        .tool-btn:hover {
+            background: #f5f5f5;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        .tool-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .ai-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .ai-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        .ai-status {
+            position: fixed;
+            top: 50%;
+            right: 30px;
+            transform: translateY(-50%);
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            gap: 15px;
+            animation: pulse 2s infinite;
+        }
+        .ai-status.active { display: flex; }
+        @keyframes pulse {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.05); }
+        }
+        .ai-avatar {
+            font-size: 48px;
+            animation: bounce 1s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-card h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        .stat-card p {
+            font-size: 32px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 AI Öğretmen İnteraktif Tahta - Test Sayfası</h1>
+        
+        <div class="demo-section">
+            <h2>📚 Örnek Problemler Seç</h2>
+            <div class="problem-grid">
+                <div class="problem-card" onclick="loadProblem('2x + 5 = 15', 'denklem')">
+                    <h3>Denklem</h3>
+                    <p>2x + 5 = 15</p>
+                </div>
+                <div class="problem-card" onclick="loadProblem('12 × 8', 'çarpma')">
+                    <h3>Çarpma</h3>
+                    <p>12 × 8</p>
+                </div>
+                <div class="problem-card" onclick="loadProblem('Kenar uzunluğu 5 cm olan bir karenin alanını bulunuz', 'geometri')">
+                    <h3>Geometri</h3>
+                    <p>Kare Alanı</p>
+                </div>
+                <div class="problem-card" onclick="loadProblem('123 + 456', 'toplama')">
+                    <h3>Toplama</h3>
+                    <p>123 + 456</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button class="tool-btn active" onclick="selectTool('pen')" title="Kalem">✏️</button>
+            <button class="tool-btn" onclick="selectTool('eraser')" title="Silgi">🧹</button>
+            <button class="tool-btn" onclick="clearCanvas()" title="Temizle">🗑️</button>
+            <button class="tool-btn" onclick="undo()" title="Geri Al">↶</button>
+            <input type="color" id="colorPicker" value="#000000" style="height: 46px; width: 60px;">
+            <input type="range" id="lineWidth" min="1" max="20" value="2" style="width: 120px;">
+            <button class="ai-btn" onclick="requestAIHelp()">🤖 AI Öğretmen Yardımı</button>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="whiteboard"></canvas>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Çözülen Problem</h3>
+                <p id="solvedCount">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Öğrenilen Adım</h3>
+                <p id="stepsLearned">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Çizim Sayısı</h3>
+                <p id="drawCount">0</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="ai-status" id="aiStatus">
+        <div class="ai-avatar">🤖</div>
+        <div>
+            <strong style="color: #667eea;">AI Öğretmen</strong><br>
+            <span id="aiMessage">Anlatıyor...</span>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('whiteboard');
+        const ctx = canvas.getContext('2d');
+        
+        // Canvas boyutlandırma
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.offsetWidth - 6;
+            canvas.height = container.offsetHeight - 6;
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        let isDrawing = false;
+        let currentTool = 'pen';
+        let drawCount = 0;
+        let solvedCount = 0;
+        let stepsLearned = 0;
+        let currentProblem = '';
+
+        // Çizim başlat
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        });
+
+        // Çiz
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            ctx.strokeStyle = currentTool === 'eraser' ? 'white' : document.getElementById('colorPicker').value;
+            ctx.lineWidth = currentTool === 'eraser' ? 20 : document.getElementById('lineWidth').value;
+            ctx.lineCap = 'round';
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            
+            drawCount++;
+            document.getElementById('drawCount').textContent = drawCount;
+        });
+
+        // Çizim bitir
+        canvas.addEventListener('mouseup', () => {
+            isDrawing = false;
+        });
+
+        function selectTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function clearCanvas() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function undo() {
+            // Basit undo - tahtayı temizle
+            clearCanvas();
+        }
+
+        function loadProblem(problem, type) {
+            currentProblem = problem;
+            clearCanvas();
+            
+            // Problemi tahtaya yaz
+            ctx.font = '28px Arial';
+            ctx.fillStyle = '#667eea';
+            ctx.textAlign = 'center';
+            ctx.fillText(problem, canvas.width / 2, 60);
+            
+            alert('Problem yüklendi: ' + problem + '\n\nŞimdi "AI Öğretmen Yardımı" butonuna tıklayın!');
+        }
+
+        async function requestAIHelp() {
+            if (!currentProblem) {
+                alert('Lütfen önce bir problem seçin!');
+                return;
+            }
+
+            // AI durumunu göster
+            document.getElementById('aiStatus').classList.add('active');
+            document.getElementById('aiMessage').textContent = 'Problem analiz ediliyor...';
+
+            try {
+                // Demo çözüm - Production'da gerçek API çağrısı yapılacak
+                const demoSolution = await simulateAISolution(currentProblem);
+                
+                // Adım adım göster
+                await displaySolution(demoSolution);
+                
+                solvedCount++;
+                document.getElementById('solvedCount').textContent = solvedCount;
+                
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            } finally {
+                document.getElementById('aiStatus').classList.remove('active');
+            }
+        }
+
+        async function simulateAISolution(problem) {
+            // Demo çözüm adımları
+            if (problem.includes('2x + 5 = 15')) {
+                return {
+                    steps: [
+                        { text: 'Adım 1: Denklemi yazalım', expression: '2x + 5 = 15', wait: 2000 },
+                        { text: 'Adım 2: 5\'i sağa geçirelim', expression: '2x = 15 - 5', wait: 2000 },
+                        { text: 'Adım 3: İşlemi yapalım', expression: '2x = 10', wait: 2000 },
+                        { text: 'Adım 4: Her iki tarafı 2\'ye bölelim', expression: 'x = 5', wait: 2000 },
+                        { text: 'Sonuç: x = 5 ✓', expression: '', wait: 1000 }
+                    ]
+                };
+            } else if (problem.includes('12 × 8')) {
+                return {
+                    steps: [
+                        { text: 'Adım 1: Çarpma işlemi', expression: '12 × 8', wait: 2000 },
+                        { text: 'Adım 2: 12\'yi 8 kere toplayalım', expression: '12+12+12+12+12+12+12+12', wait: 2000 },
+                        { text: 'Sonuç: 12 × 8 = 96 ✓', expression: '', wait: 1000 }
+                    ]
+                };
+            }
+            
+            return {
+                steps: [
+                    { text: 'Problemi çözüyorum...', expression: problem, wait: 2000 },
+                    { text: 'Çözüm tamamlandı! ✓', expression: '', wait: 1000 }
+                ]
+            };
+        }
+
+        async function displaySolution(solution) {
+            clearCanvas();
+            let yPos = 100;
+
+            for (const step of solution.steps) {
+                document.getElementById('aiMessage').textContent = step.text;
+                
+                // Adımı yaz
+                ctx.font = 'bold 20px Arial';
+                ctx.fillStyle = '#0066CC';
+                ctx.textAlign = 'left';
+                ctx.fillText(step.text, 50, yPos);
+                
+                yPos += 40;
+                
+                // İfadeyi yaz
+                if (step.expression) {
+                    ctx.font = '24px Arial';
+                    ctx.fillStyle = '#CC0000';
+                    await animateText(step.expression, 80, yPos);
+                    yPos += 50;
+                }
+                
+                stepsLearned++;
+                document.getElementById('stepsLearned').textContent = stepsLearned;
+                
+                // Bekle
+                await sleep(step.wait);
+            }
+            
+            // Tebrik mesajı
+            ctx.font = 'bold 28px Arial';
+            ctx.fillStyle = '#00AA00';
+            ctx.textAlign = 'center';
+            ctx.fillText('🎉 Harika! Problem çözüldü!', canvas.width / 2, yPos + 40);
+        }
+
+        async function animateText(text, x, y) {
+            for (let i = 0; i < text.length; i++) {
+                ctx.fillText(text[i], x + (i * 16), y);
+                await sleep(50);
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // İlk problemi yükle
+        setTimeout(() => {
+            loadProblem('2x + 5 = 15', 'denklem');
+        }, 500);
+    </script>
+</body>
+</html>

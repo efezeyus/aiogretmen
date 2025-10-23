@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Student Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Debug Student Dashboard</h1>
+    
+    <div class="debug-section">
+        <h3>1. Test Kullanıcısı Oluştur</h3>
+        <button onclick="createTestUser()">Test Kullanıcısı Oluştur</button>
+        <div id="user-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>2. LocalStorage Kontrolü</h3>
+        <button onclick="checkStorage()">Storage Kontrol Et</button>
+        <div id="storage-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>3. React App Kontrolü</h3>
+        <button onclick="checkReactApp()">React App Kontrol Et</button>
+        <div id="react-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>4. Student Dashboard Test</h3>
+        <button onclick="testStudentDashboard()">Student Dashboard Test Et</button>
+        <div id="dashboard-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>5. Console Logları</h3>
+        <button onclick="clearConsole()">Console Temizle</button>
+        <button onclick="showConsole()">Console Göster</button>
+        <div id="console-output"></div>
+    </div>
+    
+    <script>
+        function createTestUser() {
+            try {
+                localStorage.setItem('userType', 'student');
+                localStorage.setItem('userRole', 'student');
+                localStorage.setItem('userName', 'Ahmet Yılmaz');
+                localStorage.setItem('authToken', 'test_token_1_ahmet.yilmaz@okul.com');
+                localStorage.setItem('userEmail', 'ahmet.yilmaz@okul.com');
+                localStorage.setItem('userId', '1');
+                
+                document.getElementById('user-status').innerHTML = 
+                    '<p class="success">✅ Test kullanıcısı oluşturuldu!</p>';
+            } catch (error) {
+                document.getElementById('user-status').innerHTML = 
+                    '<p class="error">❌ Hata: ' + error.message + '</p>';
+            }
+        }
+        
+        function checkStorage() {
+            const userType = localStorage.getItem('userType');
+            const userRole = localStorage.getItem('userRole');
+            const userName = localStorage.getItem('userName');
+            const token = localStorage.getItem('authToken');
+            
+            document.getElementById('storage-status').innerHTML = `
+                <p><strong>User Type:</strong> ${userType || 'Yok'}</p>
+                <p><strong>User Role:</strong> ${userRole || 'Yok'}</p>
+                <p><strong>User Name:</strong> ${userName || 'Yok'}</p>
+                <p><strong>Token:</strong> ${token ? 'Mevcut' : 'Yok'}</p>
+                <p><strong>Storage Available:</strong> ${typeof(Storage) !== "undefined" ? 'Evet' : 'Hayır'}</p>
+            `;
+        }
+        
+        function checkReactApp() {
+            // React app'in yüklenip yüklenmediğini kontrol et
+            const reactApp = document.getElementById('root');
+            const hasReact = window.React !== undefined;
+            
+            document.getElementById('react-status').innerHTML = `
+                <p><strong>Root Element:</strong> ${reactApp ? 'Mevcut' : 'Yok'}</p>
+                <p><strong>React Available:</strong> ${hasReact ? 'Evet' : 'Hayır'}</p>
+                <p><strong>Current URL:</strong> ${window.location.href}</p>
+            `;
+        }
+        
+        function testStudentDashboard() {
+            // Student dashboard sayfasına git
+            window.location.href = '/student/dashboard';
+        }
+        
+        function clearConsole() {
+            console.clear();
+            document.getElementById('console-output').innerHTML = '<p>Console temizlendi</p>';
+        }
+        
+        function showConsole() {
+            // Console loglarını yakalamaya çalış
+            const originalLog = console.log;
+            const originalError = console.error;
+            const logs = [];
+            
+            console.log = function(...args) {
+                logs.push('LOG: ' + args.join(' '));
+                originalLog.apply(console, args);
+            };
+            
+            console.error = function(...args) {
+                logs.push('ERROR: ' + args.join(' '));
+                originalError.apply(console, args);
+            };
+            
+            setTimeout(() => {
+                document.getElementById('console-output').innerHTML = 
+                    '<pre>' + logs.join('\n') + '</pre>';
+            }, 1000);
+        }
+        
+        // Sayfa yüklendiğinde otomatik kontrol et
+        window.onload = function() {
+            checkStorage();
+            checkReactApp();
+        };
+    </script>
+</body>
+</html>

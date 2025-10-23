@@ -1,0 +1,31 @@
+# Minimal Gereksinimler - Python 3.13
+
+# Web Framework
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+
+# Veritabanı
+motor
+pymongo
+beanie
+
+# Kimlik Doğrulama
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+pyjwt
+
+# AI
+openai
+
+# Yardımcı
+python-dotenv
+loguru
+httpx
+aiofiles
+
+# Test
+pytest
+pytest-asyncio

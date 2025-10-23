@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Yapay Zeka Öğretmen - Kişiselleştirilmiş Eğitim Platformu{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>Yapay Zeka ile Kişiselleştirilmiş Eğitim</h1>
+            <p>MEB müfredatına uygun, öğrencilerin bireysel öğrenme hızlarına ve stillerine göre özelleştirilmiş dijital eğitim platformu. 2-12. sınıf öğrencileri için tasarlandı.</p>
+            <div class="hero-buttons">
+                <a href="/kayit" class="btn btn-primary">Hemen Başla</a>
+                <a href="/demo" class="btn btn-outline">Demoyu Deneyin</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="{{ url_for('static', path='/img/hero-image.jpg') }}" alt="Yapay Zeka ile Eğitim">
+        </div>
+    </div>
+</section>
+
+<!-- Özellikler -->
+<section class="features">
+    <div class="container">
+        <div class="section-title">
+            <h2>Neden Yapay Zeka Öğretmen?</h2>
+            <p>Yapay zeka teknolojimiz sayesinde her öğrencinin bireysel öğrenme ihtiyaçlarına uygun eğitim içerikleri sunuyoruz.</p>
+        </div>
+        
+        <div class="feature-cards">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>Yapay Zeka Teknolojisi</h3>
+                <p>Gelişmiş yapay zeka algoritmalarımız öğrencinin güçlü ve zayıf yönlerini analiz ederek kişiselleştirilmiş bir öğrenme deneyimi sunar.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h3>MEB Müfredatına Uygun</h3>
+                <p>Tüm içeriklerimiz Milli Eğitim Bakanlığı müfredatı ile uyumlu olarak hazırlanmıştır ve güncel eğitim programını takip eder.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>İlerleme Takibi</h3>
+                <p>Detaylı raporlama sistemi ile öğrencinin gelişimini anında takip edebilir, güçlü ve geliştirilmesi gereken alanları kolayca belirleyebilirsiniz.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Dersler -->
+<section class="courses">
+    <div class="container">
+        <div class="section-title">
+            <h2>Derslerimiz</h2>
+            <p>2-12. sınıflar için MEB müfredatına uygun tüm dersler platformumuzda mevcuttur.</p>
+        </div>
+        
+        <div class="course-cards">
+            <div class="course-card">
+                <div class="course-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <h3>Matematik</h3>
+                <p>Sayılar, işlemler, geometri, cebir ve daha fazlası.</p>
+            </div>
+            
+            <div class="course-card">
+                <div class="course-icon">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <h3>Fen Bilimleri</h3>
+                <p>Fizik, kimya, biyoloji konuları ve deneyler.</p>
+            </div>
+            
+            <div class="course-card">
+                <div class="course-icon">
+                    <i class="fas fa-language"></i>
+                </div>
+                <h3>Türkçe</h3>
+                <p>Dilbilgisi, okuma anlama, yazma becerileri.</p>
+            </div>
+            
+            <div class="course-card">
+                <div class="course-icon">
+                    <i class="fas fa-globe-europe"></i>
+                </div>
+                <h3>Sosyal Bilgiler</h3>
+                <p>Tarih, coğrafya, vatandaşlık bilgisi.</p>
+            </div>
+        </div>
+        
+        <div class="text-center">
+            <a href="/dersler" class="btn btn-secondary">Tüm Dersleri Gör</a>
+        </div>
+    </div>
+</section>
+
+<!-- Nasıl Çalışır -->
+<section class="how-it-works">
+    <div class="container">
+        <div class="section-title">
+            <h2>Nasıl Çalışır?</h2>
+            <p>Dört kolay adımda kişiselleştirilmiş eğitim deneyiminize başlayın.</p>
+        </div>
+        
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Üye Olun</h3>
+                <p>Hızlı bir şekilde üye olarak platformumuza erişim sağlayın.</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Değerlendirme Testini Tamamlayın</h3>
+                <p>Öğrenme stilinizi ve seviyenizi belirlemek için kısa bir test çözün.</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Kişiselleştirilmiş Ders Planını Alın</h3>
+                <p>Yapay zeka algoritmamız size özel bir ders planı oluşturur.</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3>Öğrenmeye Başlayın</h3>
+                <p>İnteraktif dersler ve alıştırmalarla öğrenme yolculuğunuza başlayın.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Kullanıcı Yorumları -->
+<section class="testimonials">
+    <div class="container">
+        <div class="section-title">
+            <h2>Kullanıcı Yorumları</h2>
+            <p>Öğrenci ve velilerden gelen değerlendirmeler.</p>
+        </div>
+        
+        <div class="testimonial-cards">
+            <div class="testimonial-card">
+                <div class="user-avatar">
+                    <img src="{{ url_for('static', path='/img/avatar1.jpg') }}" alt="Kullanıcı">
+                </div>
+                <div class="testimonial-content">
+                    <p>"Oğlum matematik derslerinde zorlanıyordu. Yapay Zeka Öğretmen sayesinde eksik konuları belirleyip, ona özel çalışma programı ile kısa sürede büyük ilerleme kaydetti."</p>
+                    <div class="user-info">
+                        <h4>Ayşe Y.</h4>
+                        <p>Veli, İstanbul</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testimonial-card">
+                <div class="user-avatar">
+                    <img src="{{ url_for('static', path='/img/avatar2.jpg') }}" alt="Kullanıcı">
+                </div>
+                <div class="testimonial-content">
+                    <p>"Öğretmen olarak sınıfımdaki öğrencilerin farklı öğrenme hızlarına yetişmekte zorlanıyordum. Bu platform sayesinde her öğrencim kendi hızında ilerleyebiliyor."</p>
+                    <div class="user-info">
+                        <h4>Mehmet A.</h4>
+                        <p>Öğretmen, Ankara</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testimonial-card">
+                <div class="user-avatar">
+                    <img src="{{ url_for('static', path='/img/avatar3.jpg') }}" alt="Kullanıcı">
+                </div>
+                <div class="testimonial-content">
+                    <p>"Sınava hazırlanırken eksik konularımı belirlemekte zorlanıyordum. Yapay Zeka Öğretmen benim için zayıf olduğum konuları belirleyip, özel sorular ve açıklamalar sundu."</p>
+                    <div class="user-info">
+                        <h4>Zeynep K.</h4>
+                        <p>8. Sınıf Öğrencisi, İzmir</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- İstatistikler -->
+<section class="stats">
+    <div class="container">
+        <div class="stats-cards">
+            <div class="stats-card">
+                <div class="stats-number">50,000+</div>
+                <div class="stats-text">Öğrenci</div>
+            </div>
+            
+            <div class="stats-card">
+                <div class="stats-number">5,000+</div>
+                <div class="stats-text">Ders İçeriği</div>
+            </div>
+            
+            <div class="stats-card">
+                <div class="stats-number">1,000+</div>
+                <div class="stats-text">Okul</div>
+            </div>
+            
+            <div class="stats-card">
+                <div class="stats-number">95%</div>
+                <div class="stats-text">Memnuniyet</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta">
+    <div class="container">
+        <h2>Eğitimde Yapay Zeka Devrimi</h2>
+        <p>Hemen ücretsiz deneme sürümüyle başlayın ve farkı görün.</p>
+        <a href="/kayit" class="btn btn-primary">Hemen Başla</a>
+    </div>
+</section>
+{% endblock %} 

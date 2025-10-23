@@ -1,0 +1,23 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logo Arkaplanı -->
+  <rect width="60" height="60" rx="10" fill="#4E54C8"/>
+  
+  <!-- Yapay Zeka Simgesi - Beyin/Devre -->
+  <path d="M30 12C24.5 12 20 16.5 20 22C20 27.5 24.5 32 30 32C35.5 32 40 27.5 40 22C40 16.5 35.5 12 30 12Z" fill="white"/>
+  <path d="M22 25C22 25 26 29 30 29C34 29 38 25 38 25" stroke="#4E54C8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M25 17C25 17 25 23 30 23C35 23 35 17 35 17" stroke="#4E54C8" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="25" cy="20" r="2" fill="#4E54C8"/>
+  <circle cx="35" cy="20" r="2" fill="#4E54C8"/>
+  
+  <!-- Kitap Simgesi -->
+  <path d="M15 36H45V48C45 49.1046 44.1046 50 43 50H17C15.8954 50 15 49.1046 15 48V36Z" fill="white"/>
+  <path d="M20 36V50" stroke="#4E54C8" stroke-width="2"/>
+  <path d="M30 36V50" stroke="#4E54C8" stroke-width="2"/>
+  <path d="M40 36V50" stroke="#4E54C8" stroke-width="2"/>
+  <path d="M15 40H45" stroke="#4E54C8" stroke-width="2"/>
+  <path d="M15 45H45" stroke="#4E54C8" stroke-width="2"/>
+  
+  <!-- Metin -->
+  <text x="70" y="25" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#4E54C8">Yapay Zeka</text>
+  <text x="70" y="45" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#5DAAE0">Öğretmen</text>
+</svg> 

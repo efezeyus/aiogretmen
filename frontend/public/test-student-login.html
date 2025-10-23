@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Student Login</title>
+</head>
+<body>
+    <h1>Test Student Login</h1>
+    <p>Bu sayfa test kullanıcısı ile giriş yapmak için kullanılır.</p>
+    
+    <button onclick="loginAsStudent()">Öğrenci Olarak Giriş Yap</button>
+    <button onclick="checkAuth()">Auth Durumunu Kontrol Et</button>
+    <button onclick="goToDashboard()">Dashboard'a Git</button>
+    
+    <div id="status"></div>
+    
+    <script>
+        function loginAsStudent() {
+            // Test kullanıcı verilerini localStorage'a kaydet
+            localStorage.setItem('userType', 'student');
+            localStorage.setItem('userRole', 'student');
+            localStorage.setItem('userName', 'Ahmet Yılmaz');
+            localStorage.setItem('authToken', 'test_token_1_ahmet.yilmaz@okul.com');
+            localStorage.setItem('userEmail', 'ahmet.yilmaz@okul.com');
+            localStorage.setItem('userId', '1');
+            
+            document.getElementById('status').innerHTML = '<p style="color: green;">✅ Test kullanıcısı giriş yaptı!</p>';
+        }
+        
+        function checkAuth() {
+            const userType = localStorage.getItem('userType');
+            const userRole = localStorage.getItem('userRole');
+            const userName = localStorage.getItem('userName');
+            const token = localStorage.getItem('authToken');
+            
+            document.getElementById('status').innerHTML = `
+                <h3>Auth Durumu:</h3>
+                <p>User Type: ${userType}</p>
+                <p>User Role: ${userRole}</p>
+                <p>User Name: ${userName}</p>
+                <p>Token: ${token ? 'Mevcut' : 'Yok'}</p>
+            `;
+        }
+        
+        function goToDashboard() {
+            window.location.href = '/student/dashboard';
+        }
+    </script>
+</body>
+</html>

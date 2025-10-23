@@ -1,0 +1,416 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Kullanıcı Yönetimi - Admin Panel | Yapay Zeka Öğretmen{% endblock %}
+
+{% block page_title %}Kullanıcı Yönetimi{% endblock %}
+
+{% block content %}
+<!-- Üst Butonlar ve Arama -->
+<div class="admin-actions">
+    <div class="search-container">
+        <input type="text" id="table-search" placeholder="Kullanıcı ara..." class="search-input">
+        <i class="fas fa-search search-icon"></i>
+    </div>
+    
+    <div class="action-buttons">
+        <button type="button" class="btn btn-primary" data-modal-target="add-user-modal">
+            <i class="fas fa-plus"></i> Yeni Kullanıcı
+        </button>
+        
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle">
+                <i class="fas fa-filter"></i> Filtrele
+            </button>
+            <div class="dropdown-menu">
+                <a href="#" class="dropdown-item" data-filter="all">Tümü</a>
+                <a href="#" class="dropdown-item" data-filter="active">Aktif</a>
+                <a href="#" class="dropdown-item" data-filter="inactive">Pasif</a>
+                <a href="#" class="dropdown-item" data-filter="admin">Yöneticiler</a>
+                <a href="#" class="dropdown-item" data-filter="student">Öğrenciler</a>
+                <a href="#" class="dropdown-item" data-filter="teacher">Öğretmenler</a>
+            </div>
+        </div>
+        
+        <button type="button" class="btn btn-outline" id="export-users">
+            <i class="fas fa-download"></i> Dışa Aktar
+        </button>
+    </div>
+</div>
+
+<!-- Ana Tablo -->
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h3>Kullanıcı Listesi</h3>
+        <div class="card-actions">
+            <span>Toplam: {{ users|length }} kullanıcı</span>
+        </div>
+    </div>
+    <div class="admin-card-body">
+        <div class="admin-table-container">
+            <table class="admin-table" id="users-table">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="select-all-users">
+                        </th>
+                        <th>ID</th>
+                        <th>Ad Soyad</th>
+                        <th>E-posta</th>
+                        <th>Rol</th>
+                        <th>Durum</th>
+                        <th>Kayıt Tarihi</th>
+                        <th>Son Giriş</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr data-user-id="{{ user.id }}" data-user-role="{{ user.role }}" data-user-status="{{ user.status }}">
+                        <td>
+                            <input type="checkbox" class="user-checkbox">
+                        </td>
+                        <td>#{{ user.id }}</td>
+                        <td>
+                            <div class="user-info-cell">
+                                <img src="{{ user.avatar }}" alt="{{ user.name }}" class="avatar-small">
+                                <span>{{ user.name }}</span>
+                            </div>
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <span class="role-badge {{ user.role }}">{{ user.role_display }}</span>
+                        </td>
+                        <td>
+                            <span class="status-badge {{ user.status }}">{{ user.status_display }}</span>
+                        </td>
+                        <td>{{ user.created_at }}</td>
+                        <td>{{ user.last_login }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button type="button" class="admin-action-btn view-btn" data-user-id="{{ user.id }}" title="Görüntüle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button" class="admin-action-btn edit-btn" data-user-id="{{ user.id }}" title="Düzenle">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="admin-action-btn delete-btn" data-user-id="{{ user.id }}" title="Sil">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Sayfalama -->
+    <div class="admin-card-footer">
+        <div class="pagination">
+            <a href="#" class="pagination-item" id="prev-page">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            
+            {% for page in range(1, total_pages + 1) %}
+            <a href="#" class="pagination-item {% if page == current_page %}active{% endif %}">{{ page }}</a>
+            {% endfor %}
+            
+            <a href="#" class="pagination-item" id="next-page">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+        
+        <div class="pagination-info">
+            <span>{{ (current_page - 1) * items_per_page + 1 }}-{{ current_page * items_per_page if current_page * items_per_page < total_items else total_items }} / {{ total_items }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Yeni Kullanıcı Modalı -->
+<div class="modal" id="add-user-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Yeni Kullanıcı Ekle</h3>
+            <button type="button" class="modal-close" data-modal-close>
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <form class="admin-form validate-form" id="add-user-form" method="POST" action="/admin/kullanicilar/ekle">
+                <div class="form-row">
+                    <div class="admin-form-group">
+                        <label for="user-name">Ad Soyad</label>
+                        <input type="text" id="user-name" name="name" class="admin-form-control" required>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="user-email">E-posta</label>
+                        <input type="email" id="user-email" name="email" class="admin-form-control" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="admin-form-group">
+                        <label for="user-password">Şifre</label>
+                        <input type="password" id="user-password" name="password" class="admin-form-control" required>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="user-password-confirm">Şifre (Tekrar)</label>
+                        <input type="password" id="user-password-confirm" name="password_confirm" class="admin-form-control" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="admin-form-group">
+                        <label for="user-role">Rol</label>
+                        <select id="user-role" name="role" class="admin-form-control" required>
+                            <option value="">Rol Seçin</option>
+                            <option value="admin">Yönetici</option>
+                            <option value="teacher">Öğretmen</option>
+                            <option value="student">Öğrenci</option>
+                            <option value="parent">Veli</option>
+                        </select>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="user-status">Durum</label>
+                        <select id="user-status" name="status" class="admin-form-control" required>
+                            <option value="active">Aktif</option>
+                            <option value="inactive">Pasif</option>
+                            <option value="pending">Onay Bekliyor</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="admin-form-group">
+                    <label for="user-bio">Hakkında</label>
+                    <textarea id="user-bio" name="bio" class="admin-form-control" rows="3"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" data-modal-close>İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Kullanıcı Düzenleme Modalı -->
+<div class="modal" id="edit-user-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Kullanıcı Düzenle</h3>
+            <button type="button" class="modal-close" data-modal-close>
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <form class="admin-form validate-form" id="edit-user-form" method="POST" action="/admin/kullanicilar/duzenle">
+                <input type="hidden" id="edit-user-id" name="id">
+                
+                <div class="form-row">
+                    <div class="admin-form-group">
+                        <label for="edit-user-name">Ad Soyad</label>
+                        <input type="text" id="edit-user-name" name="name" class="admin-form-control" required>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="edit-user-email">E-posta</label>
+                        <input type="email" id="edit-user-email" name="email" class="admin-form-control" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="admin-form-group">
+                        <label for="edit-user-role">Rol</label>
+                        <select id="edit-user-role" name="role" class="admin-form-control" required>
+                            <option value="admin">Yönetici</option>
+                            <option value="teacher">Öğretmen</option>
+                            <option value="student">Öğrenci</option>
+                            <option value="parent">Veli</option>
+                        </select>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="edit-user-status">Durum</label>
+                        <select id="edit-user-status" name="status" class="admin-form-control" required>
+                            <option value="active">Aktif</option>
+                            <option value="inactive">Pasif</option>
+                            <option value="pending">Onay Bekliyor</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="admin-form-group">
+                    <label for="edit-user-bio">Hakkında</label>
+                    <textarea id="edit-user-bio" name="bio" class="admin-form-control" rows="3"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="admin-form-group">
+                        <label for="edit-user-password">Yeni Şifre (Boş bırakılabilir)</label>
+                        <input type="password" id="edit-user-password" name="password" class="admin-form-control">
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="edit-user-password-confirm">Şifre (Tekrar)</label>
+                        <input type="password" id="edit-user-password-confirm" name="password_confirm" class="admin-form-control">
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" data-modal-close>İptal</button>
+                    <button type="submit" class="btn btn-primary">Güncelle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Silme Onay Modalı -->
+<div class="modal" id="delete-user-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Kullanıcı Sil</h3>
+            <button type="button" class="modal-close" data-modal-close>
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <p>Bu kullanıcıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" data-modal-close>İptal</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-user">Sil</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Kullanıcı düzenleme modalını aç
+        const editButtons = document.querySelectorAll('.edit-btn');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.getAttribute('data-user-id');
+                
+                // AJAX ile kullanıcı verilerini al
+                fetch(`/admin/api/users/${userId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Form alanlarını doldur
+                        document.getElementById('edit-user-id').value = data.id;
+                        document.getElementById('edit-user-name').value = data.name;
+                        document.getElementById('edit-user-email').value = data.email;
+                        document.getElementById('edit-user-role').value = data.role;
+                        document.getElementById('edit-user-status').value = data.status;
+                        document.getElementById('edit-user-bio').value = data.bio || '';
+                        
+                        // Modalı aç
+                        document.getElementById('edit-user-modal').classList.add('active');
+                    });
+            });
+        });
+        
+        // Kullanıcı silme modalını aç
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        let userIdToDelete = null;
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                userIdToDelete = this.getAttribute('data-user-id');
+                document.getElementById('delete-user-modal').classList.add('active');
+            });
+        });
+        
+        // Silme işlemini onayla
+        document.getElementById('confirm-delete-user').addEventListener('click', function() {
+            if (userIdToDelete) {
+                // AJAX ile kullanıcıyı sil
+                fetch(`/admin/api/users/${userIdToDelete}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Kullanıcıyı listeden kaldır
+                            const userRow = document.querySelector(`tr[data-user-id="${userIdToDelete}"]`);
+                            if (userRow) {
+                                userRow.remove();
+                            }
+                            
+                            // Modalı kapat
+                            document.getElementById('delete-user-modal').classList.remove('active');
+                            
+                            // Bildirim göster
+                            alert('Kullanıcı başarıyla silindi.');
+                        } else {
+                            alert('Kullanıcı silinirken bir hata oluştu.');
+                        }
+                    });
+            }
+        });
+        
+        // Tüm kullanıcıları seç/kaldır
+        const selectAllCheckbox = document.getElementById('select-all-users');
+        const userCheckboxes = document.querySelectorAll('.user-checkbox');
+        
+        selectAllCheckbox.addEventListener('change', function() {
+            userCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+        
+        // Filtreler
+        const filterLinks = document.querySelectorAll('[data-filter]');
+        filterLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const filter = this.getAttribute('data-filter');
+                const rows = document.querySelectorAll('#users-table tbody tr');
+                
+                rows.forEach(row => {
+                    if (filter === 'all') {
+                        row.style.display = '';
+                    } else {
+                        const userRole = row.getAttribute('data-user-role');
+                        const userStatus = row.getAttribute('data-user-status');
+                        
+                        if (userRole === filter || userStatus === filter) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        });
+        
+        // Arama işlevi
+        const searchInput = document.getElementById('table-search');
+        searchInput.addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#users-table tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %} 
