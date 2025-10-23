@@ -35,6 +35,5 @@ pytest==7.4.4
 pytest-asyncio==0.23.3
 faker==22.2.0
 
-# CORS
-python-cors==1.0.0
+# NOT: CORS için ayrı paket gerekmez, FastAPI built-in CORSMiddleware kullanır
 
